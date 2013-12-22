@@ -2,14 +2,19 @@
 #define cpp_rts_windowengine
 
 #include <windows.h>
-#include "core/global.h"
 
 namespace graphics{
 	namespace engine{
 		struct windowEngine{
-			static void genWndClass(WNDCLASS*, const HINSTANCE, const WNDPORC, const LPCSTR);
-			static void 
+			static HWND hWnd;
+			static HDC hDC;
 			
+			static WNDCLASS* genWndClass(const HINSTANCE, const WNDPORC, const LPCSTR) const;
+			static bool bindWndClass(WNDCLASS*);
+			static bool createWindow(const HINSTANCE, const WNDPROC);
+			static void makeAvailable();
+			static HDC getHDC();
+			static HWND getHWND();
 		}
 	}
 }
