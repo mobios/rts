@@ -5,7 +5,9 @@
 #include <GL\glext.h>
 #include <GL\wglext.h>
 
-#define __loadGl(func, ptrtype) func = (ptrtype) wglGetProcAddress(#func)
+#define __loadGL(func, ptrtype) func = (ptrtype) wglGetProcAddress(#func)
+
+typedef HGLRC (APIENTRYP PFNWGLCREATECONTEXTATTRIBSARBPROC) (HDC hDC, HGLRC hShareContext, const int *attribList);
 
 namespace graphics{
 	PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;
@@ -34,7 +36,7 @@ namespace graphics{
 	PFNGLDELETESHADERPROC glDeleteShader;
 	PFNGLGENVERTEXARRAYSPROC glGenVertexArrays;
 	PFNGLBINDVERTEXARRAYPROC glBindVertexArray;
-}
+};
 
 
 #endif

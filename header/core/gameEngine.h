@@ -2,14 +2,19 @@
 #define cpp_rts_gameengine
 
 #include <string>
+#include <windows.h>
 
 namespace core{
 	namespace engine{
-		struct gameEngine{
-			static void error(bool, std::string&);
-			static void error(std::string&);
-			static void glError(std::string&);
-		}
+		class gameEngine{
+			static HINSTANCE hInstance;
+		public:
+			static void error(bool, std::string);
+			static void error(std::string);
+			static void setup(HINSTANCE);
+			static void run();
+			static void input();
+		};
 	}
 }
 

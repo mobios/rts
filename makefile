@@ -1,8 +1,12 @@
 all: rts.exe
 
-rts.exe: object/main.o
-	g++ object/main.o -lopengl32 -lgdi32 -orts.exe -static
+rts.exe: object/engine.o object/graphics.o
+	g++ object/engine.o object/graphics.o -lopengl32 -lgdi32 -orts.exe -static
 	
-object/main.o: header/main.h source/main.cpp
-	g++ -Iheader -c -std=c++0x source/main.cpp
-	mv main.o object
+object/engine.o: header/core/gameEngine.h src/core/gameEngine.cpp
+	g++ -Iheader -c -std=c++0x src/core/gameEngine.cpp -o engine.o
+	mv engine.o object
+	
+object/graphics.o: header/graphics/glWrapper.h header/graphics/graphics.h src/graphics/graphics.cpp
+	g++ -Iheader -c -std=c++0x src/graphics/graphics.cpp
+	mv graphics.o object

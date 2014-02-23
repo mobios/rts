@@ -1,3 +1,10 @@
+#ifndef cpp_rts_graphics
+#define cpp_rts_graphics
+#include <windows.h>
+
+#define WGL_CONTEXT_MAJOR_VERSION_ARB 0x2091
+#define WGL_CONTEXT_MINOR_VERSION_ARB 0x2092
+#define WGL_CONTEXT_FLAGS_ARB 0x2094
 
 namespace graphics{
 	namespace engine{
@@ -5,26 +12,31 @@ namespace graphics{
 			static HWND hWnd;
 			static HDC hDC;
 			
-			static WNDCLASS* genWndClass(const HINSTANCE, const WNDPORC, const LPCSTR) const;
+			static WNDCLASS* genWndClass(const HINSTANCE, const WNDPROC, const LPCSTR);
 			static bool bindWndClass(WNDCLASS*);
 			static bool createWindow(const HINSTANCE, const WNDPROC);
 			static void makeAvailable();
 			static HDC getHDC();
 			static HWND getHWND();
-		}
+			static void setup(const HINSTANCE, const WNDPROC);
+		};
 		
 		struct renderEngine{
-			static bool funcLoad = false;
-			static bool context = false;
-			static const HDC* const hDC = &windowEngine::hDC;
+			static bool funcload;
+			static bool context;
+			static constexpr HDC* hDC = &windowEngine::hDC;
 			
-			static HGLRC hGLrc = NULL;
+			static HGLRC hGLrc;
+			
 			
 			static void makeOldContext();
 			static void makeNewContext();
-			static void loadExtentions();
+			static void loadExtensions();
 			static void registerShader();
 			static void makeCurrent(const HDC, const bool erase = false);
-		}
+			static void setup();
+		};
 	}
 }
+
+#endif
