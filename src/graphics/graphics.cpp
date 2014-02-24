@@ -196,6 +196,7 @@ GLuint renderEngine::loadShader(std::string spathparam, GLenum shaderType){
 		free(logContents);
 		core::engine::gameEngine::error(errormsg);
 	}
+	free(shaderString);
 }
 	
 
