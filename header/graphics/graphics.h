@@ -42,6 +42,7 @@ namespace graphics{
 			static void setup();
 			
 			static GLuint loadShader(std::string, GLenum);
+			static void setupProgram();
 		};
 	}
 }

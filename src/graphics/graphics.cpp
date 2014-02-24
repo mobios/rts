@@ -199,6 +199,31 @@ GLuint renderEngine::loadShader(std::string spathparam, GLenum shaderType){
 	free(shaderString);
 }
 	
+void renderEngine::setupProgram(){
+	auto glProgram = glCreateProgram();
+	glAttachShader(glProgram, loadShader("fragment.glsl", GL_FRAGMENT_SHADER));
+	glAttachShader(glProgram, loadShader("vertex.glsl", GL_VERTEX_SHADER));
+	glLinkProgram(glProgram);
+	
+	GLint programResult = GL_TRUE;
+	glGetProgramiv(glProgram, GL_LINK_STATUS, &programResult);
+	
+	if(programResult != GL_TRUE){
+		std::size_t logLength;
+		glGetProgramiv(glProgram, GL_INFO_LOG_LENGTH, (int*)&logLength);
+		char* logContents = (char*)malloc(logLength);
+		glGetProgramInfoLog(glProgram, logLength, (int*)&logLength, logContents);
+		logContents[logLength-1] = 0;
+		std::string msg = "Main OpenGL program could not link:\n" + logContents;
+		free(logContents);
+		core::engine::gameEngine::error(msg);
+	}
+	
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	
+	glDisable(GL_DEPTH_TEST);
+}
 
 // Static reservations
 
