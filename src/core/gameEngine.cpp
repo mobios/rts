@@ -37,10 +37,15 @@ void gameEngine::run(){
 void gameEngine::input(){
 	MSG msg;
 	while(GetMessage(&msg,NULL,0,0)){
-		switch(msg){
-			
+		switch(msg.message){
+		case WM_CLOSE:
+			exit(0);
+			break;
+		}
 		TranslateMessage(&msg);
-		
+		DispatchMessage(&msg);
+	}
+}
 
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow){
 	__debugMsg(Initialization);

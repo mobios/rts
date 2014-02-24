@@ -1,6 +1,12 @@
 #ifndef cpp_rts_graphics
 #define cpp_rts_graphics
 #include <windows.h>
+#include <GL\gl.h>
+#include <GL\glext.h>
+#include <GL\wglext.h>
+#include <cstdlib>
+#include <string>
+#include <fstream>
 
 #define WGL_CONTEXT_MAJOR_VERSION_ARB 0x2091
 #define WGL_CONTEXT_MINOR_VERSION_ARB 0x2092
@@ -32,9 +38,10 @@ namespace graphics{
 			static void makeOldContext();
 			static void makeNewContext();
 			static void loadExtensions();
-			static void registerShader();
 			static void makeCurrent(const HDC, const bool erase = false);
 			static void setup();
+			
+			static GLuint loadShader(std::string, GLenum);
 		};
 	}
 }

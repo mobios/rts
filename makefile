@@ -1,7 +1,7 @@
 all: rts.exe
 
 rts.exe: object/engine.o object/graphics.o
-	g++ object/engine.o object/graphics.o -lopengl32 -lgdi32 -orts.exe -static
+	g++ object/engine.o object/graphics.o -lopengl32 -lgdi32 -orts.exe -static -mwindows
 	
 object/engine.o: header/core/gameEngine.h src/core/gameEngine.cpp
 	g++ -Iheader -c -std=c++0x src/core/gameEngine.cpp -o engine.o

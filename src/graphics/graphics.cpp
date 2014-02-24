@@ -2,9 +2,6 @@
 #include "graphics/glWrapper.h"
 #include "core/gameEngine.h"
 #include "global.h"
-#include <GL\gl.h>
-#include <GL\glext.h>
-#include <GL\wglext.h>
 
 using namespace graphics::engine;
 
@@ -166,6 +163,41 @@ void renderEngine::setup(){
 	loadExtensions();
 	makeNewContext();
 }
+
+GLuint renderEngine::loadShader(std::string spathparam, GLenum shaderType){
+	const GLuint shaderID = glCreateShader(shaderType);
+	std::string shaderSource;
+	std::ifstream shaderFile(spathparam, std::ios::in);
+	
+	if(!shaderFile.is_open())
+		core::engine::gameEngine::error("File I/O error for shader at path: " + spathparam);
+		
+	shaderFile.seekg(0,std::ios_base::end);
+	std::streampos shaderFileSize = shaderFile.tellg();
+	shaderFile.seekg(0,std::ios_base::beg);
+	
+	char* shaderString = (char*) malloc(shaderFileSize);
+	shaderFile.read(shaderString, shaderFileSize);
+	
+	glShaderSource(shaderID, 1, &shaderString, NULL);
+	glCompileShader(shaderID);
+	
+	GLint compResult = GL_TRUE;
+	glGetShaderiv(shaderID, GL_COMPILE_STATUS, &compResult);
+	
+	if(compResult == GL_FALSE){
+		std::size_t shaderLogLength;
+		glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, (int*)&shaderLogLength);
+		
+		char* logContents = (char*) malloc(shaderLogLength);
+		glGetShaderInfoLog(shaderID, shaderLogLength, (int*)&shaderLogLength, logContents);
+		logContents[shaderLogLength-1] = 0;
+		std::string errormsg = "Shader at path: " + spathparam + " could not compile. \n Error: \n\n" + logContents;
+		free(logContents);
+		core::engine::gameEngine::error(errormsg);
+	}
+}
+	
 
 // Static reservations
 
