@@ -214,7 +214,7 @@ void renderEngine::setupProgram(){
 		char* logContents = (char*)malloc(logLength);
 		glGetProgramInfoLog(glProgram, logLength, (int*)&logLength, logContents);
 		logContents[logLength-1] = 0;
-		std::string msg = "Main OpenGL program could not link:\n" + logContents;
+		std::string msg = "Main OpenGL program could not link:\n" + std::string(logContents);
 		free(logContents);
 		core::engine::gameEngine::error(msg);
 	}
