@@ -1,3 +1,9 @@
+#ifndef cpp_rts_inputengine
+#define cpp_rts_inputengine
+
+#include <vector>
+#include <windows>
+
 namespace core{
 	namespace input{
 		struct clickable{
@@ -12,6 +18,8 @@ namespace core{
 			float y;
 			float xsize;
 			float ysize;
+			
+			bool inbounds(signed short x, signed short y);
 		};
 
 		struct keyObj{
@@ -20,8 +28,9 @@ namespace core{
 		}
 		
 		struct inputEngine{
-			static void vector<clickable> mouseEvents;
-			static void vector<keyObj> keyEvents;
+			static void std::vector<clickable> mouseEvents;
+			static void std::vector<keyObj> keyEvents;
+			
 			static MSG postMsg(MSG);
 			static void registerMouse(clickable*);
 			static void registerKey(clickable*);
