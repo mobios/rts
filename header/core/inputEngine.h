@@ -35,6 +35,15 @@ namespace core{
 			static void registerMouse(clickable*);
 			static void registerKey(clickable*);
 			static void bound(unsigned int);
+			static bool isShift();
+			static bool isCtrl();
+			
+		private:
+			static void checkModify(WPARAM);
+			
+			static bool shift;
+			static bool ctrl;
+			static bool raw;
 		}
 	}
 }
