@@ -16,7 +16,7 @@ void inputEngine::checkModify(WPARAM wParam){
 MSG inputEngine::postMsg(MSG msg, WPARAM wParam, LPARAM lParam){
 	switch(msg){
 	case WM_LBUTTONDOWN:
-		for(clickable* mouseObj : mouseEvents){
+		for(flatMouse* mouseObj : mouseEvents){
 			if(mouseObj->inbounds(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam))){
 				checkModify(wParam);					
 				mouseObj->down_l();
@@ -26,7 +26,7 @@ MSG inputEngine::postMsg(MSG msg, WPARAM wParam, LPARAM lParam){
 		return msg;
 		
 	case WM_LBUTTONUP:
-		for(clickable* mouseObj : mouseEvents){
+		for(flatMouse* mouseObj : mouseEvents){
 			if(mouseObj->inbounds(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam))){
 				checkModify(wParam);
 				mouseObj->up_l();
@@ -36,7 +36,7 @@ MSG inputEngine::postMsg(MSG msg, WPARAM wParam, LPARAM lParam){
 		return msg;
 		
 	case WM_RBUTTONDOWN:
-		for(clickable* mouseObj : mouseEvents){
+		for(flatMouse* mouseObj : mouseEvents){
 			if(mouseObj->inbounds(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam))){
 				checkModify(wParam);
 				mouseObj->down_r();
@@ -46,7 +46,7 @@ MSG inputEngine::postMsg(MSG msg, WPARAM wParam, LPARAM lParam){
 		return msg;	
 		
 	case WM_RBUTTONUP:
-		for(clickable* mouseObj : mouseEvents){
+		for(flatMouse* mouseObj : mouseEvents){
 			if(mouseObj->inbounds(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam))){
 				checkModify(wParam);
 				mouseObj->up_r();
@@ -54,5 +54,15 @@ MSG inputEngine::postMsg(MSG msg, WPARAM wParam, LPARAM lParam){
 			}
 		}
 		return msg;
-	
+		
+	case WM_MOUSEMOVE:
+		if(settings::raw || !settings::hwpointer)
+			return msg;
+		
+		mousex = GET_X_LPARAM(lparam);
+		mousey = GET_Y_LPARAM(lparam);
+		return 0;
+	}
+	return msg;
+}
 	
