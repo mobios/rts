@@ -1,20 +1,24 @@
 #include "inputEngine.h"
 
 using namespace core::input;
-void inputEngine::checkModify(WPARAM wParam){
-	if(wParam | MK_SHIFT)
-		shift = true;
-	else
-		shift = false;
-		
-	if(wParam | MK_CTRL)
-		ctrl = true;
-	else
-		ctrl = false;
-}
+
+bool flatMouse::inbounds(signed short x, signed short y){
+	testx = graphics::normalizeX(x);
+	testy = graphics::normalizeY(y);
 	
+	if(testx > x+xsize || testx < x)
+		return false;
+	
+	if(testy > y+ysize || testy < y)
+		return false;
+		
+	return true;
+}
+
 MSG inputEngine::postMsg(MSG msg, WPARAM wParam, LPARAM lParam){
 	switch(msg){
+	
+	
 	case WM_LBUTTONDOWN:
 		checkModify(wParam);
 		for(flatMouse* mouseObj : mouseEvents){
@@ -81,5 +85,39 @@ MSG inputEngine::postMsg(MSG msg, WPARAM wParam, LPARAM lParam){
 	return msg;
 }
 
+void inputEngine::registerMouse(flatMouse* mobj){
+	mouseEvents.push(mobj);
+}
 
-	
+void inputEngine::registerKey(keyObj* kobj){
+	keyEvents.push(kobj);
+}
+
+void inputEngine::notifyDead(flatMouse* mobj){
+	mouseEvents.remove(mobj);
+}
+
+void inputEngine::removeKey(keyObj* kobj){
+	keyEvents.remove(kobj);
+}
+
+void inputEngine::checkModify(WPARAM wParam){
+	if(wParam | MK_SHIFT)
+		shift = true;
+	else
+		shift = false;
+		
+	if(wParam | MK_CTRL)
+		ctrl = true;
+	else
+		ctrl = false;
+}
+
+std::list<flatMouse*> inputEngine::mouseEvents;
+std::list<keyObj*> inputEngine::keyEvents;
+bool inputEngine::shift;
+bool inputEngine::ctrl;
+int inputEngine::mousex;
+int inputEngine::mousey;
+bool settings::raw;
+bool settings::hwpointer;

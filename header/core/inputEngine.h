@@ -1,7 +1,7 @@
 #ifndef cpp_rts_inputengine
 #define cpp_rts_inputengine
 
-#include <vector>
+#include <list>
 #include <windows>
 
 namespace core{
@@ -28,8 +28,8 @@ namespace core{
 		}
 		
 		struct inputEngine{
-			static void std::vector<flatMouse*> mouseEvents;
-			static void std::vector<keyObj*> keyEvents;
+			static void std::list<flatMouse*> mouseEvents;
+			static void std::list<keyObj*> keyEvents;
 			
 			static MSG postMsg(MSG);
 			static void registerMouse(flatMouse*);
@@ -38,6 +38,7 @@ namespace core{
 			static bool isCtrl(){return ctrl;};
 			
 			static void notifyDead(flatMouse*);
+			static void removeKey(keyObj*);
 			
 		private:
 			static void checkModify(WPARAM);
