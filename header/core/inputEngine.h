@@ -28,15 +28,16 @@ namespace core{
 		}
 		
 		struct inputEngine{
-			static void std::vector<flatMouse> mouseEvents;
-			static void std::vector<keyObj> keyEvents;
+			static void std::vector<flatMouse*> mouseEvents;
+			static void std::vector<keyObj*> keyEvents;
 			
 			static MSG postMsg(MSG);
 			static void registerMouse(flatMouse*);
 			static void registerKey(keyObj*);
-			static void bound(unsigned int);
 			static bool isShift(){return shift;};
 			static bool isCtrl(){return ctrl;};
+			
+			static void notifyDead(flatMouse*);
 			
 		private:
 			static void checkModify(WPARAM);
@@ -46,11 +47,13 @@ namespace core{
 			
 			static int mousex;
 			static int mousey;
+			
+			static flatMouse* higlight;
 		}
 		
 		class settings{
 			static bool raw;
 			static bool hwpointer;
-			
+		}
 	}
 }
