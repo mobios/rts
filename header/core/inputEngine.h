@@ -1,18 +1,18 @@
 #ifndef cpp_rts_inputengine
 #define cpp_rts_inputengine
 
-#include <vector>
+#include <list>
 #include <windows>
 
 namespace core{
 	namespace input{
-		struct clickable{
-			virtual void over;
-			virtual void out;
-			virtual void down_l;
-			virtual void up_l;
-			virtual void down_r;
-			virtual void up_r;
+		struct flatMouse{
+			virtual void over();
+			virtual void out();
+			virtual void down_l();
+			virtual void up_l();
+			virtual void down_r();
+			virtual void up_r();
 			
 			float x;
 			float y;
@@ -28,22 +28,33 @@ namespace core{
 		}
 		
 		struct inputEngine{
-			static void std::vector<clickable> mouseEvents;
-			static void std::vector<keyObj> keyEvents;
+			static void std::list<flatMouse*> mouseEvents;
+			static void std::list<keyObj*> keyEvents;
 			
 			static MSG postMsg(MSG);
-			static void registerMouse(clickable*);
-			static void registerKey(clickable*);
-			static void bound(unsigned int);
-			static bool isShift();
-			static bool isCtrl();
+			static void registerMouse(flatMouse*);
+			static void registerKey(keyObj*);
+			static bool isShift(){return shift;};
+			static bool isCtrl(){return ctrl;};
+			
+			static void notifyDead(flatMouse*);
+			static void removeKey(keyObj*);
 			
 		private:
 			static void checkModify(WPARAM);
 			
 			static bool shift;
 			static bool ctrl;
+			
+			static int mousex;
+			static int mousey;
+			
+			static flatMouse* higlight;
+		}
+		
+		class settings{
 			static bool raw;
+			static bool hwpointer;
 		}
 	}
 }
