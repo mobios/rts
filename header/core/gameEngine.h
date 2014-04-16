@@ -3,6 +3,9 @@
 
 #include <string>
 #include <windows.h>
+#include <iostream>
+#include <io.h>
+#include <fcntl.h>
 
 namespace core{
 	namespace engine{
@@ -14,6 +17,7 @@ namespace core{
 			static void setup(HINSTANCE);
 			static void run();
 			static void input();
+			static void teardown(int xit = 0);
 		};
 	}
 }

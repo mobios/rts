@@ -60,6 +60,7 @@ MSG inputEngine::postMsg(MSG msg, WPARAM wParam, LPARAM lParam){
 		return msg;
 		
 	case WM_MOUSEMOVE:
+		std::cout << "X: " << GET_X_LPARAM(lParam) << "  Y: " << GET_Y_LPARAM(lParam) << std::endl;
 		checkModify(wParam);
 		if(settings::raw)
 			return msg;
@@ -112,6 +113,8 @@ void inputEngine::checkModify(WPARAM wParam){
 	else
 		ctrl = false;
 }
+
+
 
 std::list<flatMouse*> inputEngine::mouseEvents;
 std::list<keyObj*> inputEngine::keyEvents;

@@ -48,7 +48,7 @@ namespace graphics{
 		struct settings{
 			float aspcx;
 			float aspcy;
-		}
+		};
 	}
 	float normalizeX(short int x);
 	float normalizeY(short int y);
