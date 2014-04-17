@@ -6,6 +6,9 @@
 #include <iostream>
 #include <io.h>
 #include <fcntl.h>
+#undef __STRICT_ANSI__
+#include <cstdio>
+#define __STRICT_ANSI__
 
 namespace core{
 	namespace engine{

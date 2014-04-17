@@ -1,10 +1,13 @@
 #include "core/gameEngine.h"
 #include "graphics/graphics.h"
+#include "core/inputEngine.h"
 #include "global.h"
 
 using namespace core::engine;
 
 LRESULT CALLBACK WndProcStatic(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam){
+	if(core::inputEngine::postMsg(msg, wparam, lparam))
+		return 0;
 	return DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
@@ -32,6 +35,7 @@ void gameEngine::setup(HINSTANCE hInst){
 		FILE* stdstream = _fdopen(stdoutFhandle, "w");
 		*stdout = *stdstream;
 		std::cout.clear();
+		std::cout << "RUNNING\n";
 	#endif
 }
 
@@ -44,7 +48,7 @@ void gameEngine::run(){
 
 void gameEngine::input(){
 	MSG msg;
-	while(GetMessage(&msg,NULL,0,0)){
+	while(PeekMessage(&msg,NULL,0,0, PM_REMOVE)){
 		switch(msg.message){
 		case WM_CLOSE:
 			teardown();

@@ -1,10 +1,11 @@
-#include "inputEngine.h"
+#include "core/inputEngine.h"
+#include "graphics/graphics.h"
 
 using namespace core::input;
 
 bool flatMouse::inbounds(signed short x, signed short y){
-	testx = graphics::normalizeX(x);
-	testy = graphics::normalizeY(y);
+	auto testx = graphics::normalizeX(x);
+	auto testy = graphics::normalizeY(y);
 	
 	if(testx > x+xsize || testx < x)
 		return false;
@@ -15,100 +16,99 @@ bool flatMouse::inbounds(signed short x, signed short y){
 	return true;
 }
 
-MSG inputEngine::postMsg(MSG msg, WPARAM wParam, LPARAM lParam){
+bool core::inputEngine::postMsg(UINT msg, WPARAM wParam, LPARAM lParam){
 	switch(msg){
-	
-	
 	case WM_LBUTTONDOWN:
+		std::cout << "Lclick\n";
 		checkModify(wParam);
 		for(flatMouse* mouseObj : mouseEvents){
 			if(mouseObj->inbounds(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam))){					
 				mouseObj->down_l();
-				return 0;
+				return true;
 			}
 		}
-		return msg;
+		return false;
 		
 	case WM_LBUTTONUP:
 		checkModify(wParam);
 		for(flatMouse* mouseObj : mouseEvents){
 			if(mouseObj->inbounds(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam))){
 				mouseObj->up_l();
-				return 0;
+				return true;
 			}
 		}
-		return msg;
+		return false;
 		
 	case WM_RBUTTONDOWN:
 		checkModify(wParam);
 		for(flatMouse* mouseObj : mouseEvents){
 			if(mouseObj->inbounds(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam))){
 				mouseObj->down_r();
-				return 0;
+				return true;
 			}
 		}
-		return msg;	
+		return false;	
 		
 	case WM_RBUTTONUP:
 		checkModify(wParam);
 		for(flatMouse* mouseObj : mouseEvents){
 			if(mouseObj->inbounds(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam))){
 				mouseObj->up_r();
-				return 0;
+				return true;
 			}
 		}
-		return msg;
+		return false;
 		
 	case WM_MOUSEMOVE:
 		std::cout << "X: " << GET_X_LPARAM(lParam) << "  Y: " << GET_Y_LPARAM(lParam) << std::endl;
 		checkModify(wParam);
-		if(settings::raw)
-			return msg;
+		if(settings::getRaw())
+			return false;
 		
-		if(highlight != NULL && !highlight->inbounds(GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam))
+		if(highlight != NULL && !highlight->inbounds(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)))
 			highlight->out();
 		
 		for(flatMouse* mouseObj : mouseEvents){
-			if(mouseObj->inbounds(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)){
+			if(mouseObj->inbounds(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam))){
 				highlight = mouseObj;
-				highlight.over();
-				return 0;
+				highlight->over();
+				return true;
 			}
 		}
 		
-		if(!settings::hwpointer)
-			return 0;
+		if(settings::getHwpointer())
+			return true;
 		
-		mousex = GET_X_LPARAM(lparam);
-		mousey = GET_Y_LPARAM(lparam);
-		return 0;
+		mousex = GET_X_LPARAM(lParam);
+		mousey = GET_Y_LPARAM(lParam);
+		return true;
 	}
-	return msg;
+	return false;
 }
 
-void inputEngine::registerMouse(flatMouse* mobj){
-	mouseEvents.push(mobj);
+void core::inputEngine::registerMouse(flatMouse* mobj){
+	mouseEvents.push_back(mobj);
 }
 
-void inputEngine::registerKey(keyObj* kobj){
-	keyEvents.push(kobj);
+void core::inputEngine::registerKey(keyObj* kobj){
+	keyEvents.push_back(kobj);
 }
 
-void inputEngine::notifyDead(flatMouse* mobj){
+void core::inputEngine::notifyDead(flatMouse* mobj){
 	mouseEvents.remove(mobj);
 }
 
-void inputEngine::removeKey(keyObj* kobj){
+void core::inputEngine::removeKey(keyObj* kobj){
 	keyEvents.remove(kobj);
 }
 
-void inputEngine::checkModify(WPARAM wParam){
+void core::inputEngine::checkModify(WPARAM wParam){
 	if(wParam | MK_SHIFT)
 		shift = true;
 	else
 		shift = false;
 		
-	if(wParam | MK_CTRL)
+	if(wParam | MK_CONTROL)
 		ctrl = true;
 	else
 		ctrl = false;
@@ -116,11 +116,11 @@ void inputEngine::checkModify(WPARAM wParam){
 
 
 
-std::list<flatMouse*> inputEngine::mouseEvents;
-std::list<keyObj*> inputEngine::keyEvents;
-bool inputEngine::shift;
-bool inputEngine::ctrl;
-int inputEngine::mousex;
-int inputEngine::mousey;
+std::list<flatMouse*> core::inputEngine::mouseEvents;
+std::list<keyObj*> core::inputEngine::keyEvents;
+bool core::inputEngine::shift;
+bool core::inputEngine::ctrl;
+int core::inputEngine::mousex;
+int core::inputEngine::mousey;
 bool settings::raw;
 bool settings::hwpointer;

@@ -179,7 +179,7 @@ GLuint renderEngine::loadShader(std::string spathparam, GLenum shaderType){
 	char* shaderString = (char*) malloc(shaderFileSize);
 	shaderFile.read(shaderString, shaderFileSize);
 	
-	glShaderSource(shaderID, 1, &shaderString, NULL);
+	glShaderSource(shaderID, 1, (const char**)&shaderString, NULL);
 	glCompileShader(shaderID);
 	
 	GLint compResult = GL_TRUE;

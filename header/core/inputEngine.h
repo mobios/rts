@@ -1,8 +1,11 @@
 #ifndef cpp_rts_inputengine
 #define cpp_rts_inputengine
 
+#include <windows.h>
+#include <windowsx.h>
 #include <list>
-#include <windows>
+#include <iostream>
+
 
 namespace core{
 	namespace input{
@@ -23,38 +26,43 @@ namespace core{
 		};
 
 		struct keyObj{
-			virtual void call;
+			virtual void call();
 			unsigned int key;
-		}
-		
-		struct inputEngine{
-			static void std::list<flatMouse*> mouseEvents;
-			static void std::list<keyObj*> keyEvents;
-			
-			static MSG postMsg(MSG);
-			static void registerMouse(flatMouse*);
-			static void registerKey(keyObj*);
-			static bool isShift(){return shift;};
-			static bool isCtrl(){return ctrl;};
-			
-			static void notifyDead(flatMouse*);
-			static void removeKey(keyObj*);
-			
-		private:
-			static void checkModify(WPARAM);
-			
-			static bool shift;
-			static bool ctrl;
-			
-			static int mousex;
-			static int mousey;
-			
-			static flatMouse* higlight;
-		}
+		};
 		
 		class settings{
 			static bool raw;
 			static bool hwpointer;
-		}
-	}
-}
+			
+		public:
+			static bool getRaw(){return raw;};
+			static bool getHwpointer(){return hwpointer;};
+		};
+	};
+	
+	struct inputEngine{
+		static std::list<input::flatMouse*> mouseEvents;
+		static std::list<input::keyObj*> keyEvents;
+		
+		static bool postMsg(UINT, WPARAM, LPARAM);
+		static void registerMouse(input::flatMouse*);
+		static void registerKey(input::keyObj*);
+		static bool isShift(){return shift;};
+		static bool isCtrl(){return ctrl;};
+		
+		static void notifyDead(input::flatMouse*);
+		static void removeKey(input::keyObj*);
+		
+	private:
+		static void checkModify(WPARAM);
+		
+		static bool shift;
+		static bool ctrl;
+		
+		static int mousex;
+		static int mousey;
+		
+		static input::flatMouse* highlight;
+	};
+};
+#endif
