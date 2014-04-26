@@ -50,7 +50,9 @@ void gameEngine::input(){
 	MSG msg;
 	while(PeekMessage(&msg,NULL,0,0, PM_REMOVE)){
 		switch(msg.message){
+		case WM_DESTROY:
 		case WM_CLOSE:
+			std::cout << "teardown\n";
 			teardown();
 			break;
 		}

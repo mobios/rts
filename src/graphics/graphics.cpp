@@ -225,6 +225,9 @@ void renderEngine::setupProgram(){
 	glDisable(GL_DEPTH_TEST);
 }
 
+float graphics::normalizeX(short int x){return 0.f;};
+float graphics::normalizeY(short int x){return 0.f;};
+
 // Static reservations
 
 HWND windowEngine::hWnd;

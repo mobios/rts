@@ -10,6 +10,7 @@
 #define PARAM_DEBUG
 #ifdef PARAM_DEBUG
 	#define __debugMsg(message) {std::cout << DEBUG_FORMAT << DEBUG_SPACING << #message << "[OK]" << std::endl;}
+	#define __debugFail(message) {std::cout << DEBUG_FORMAT << DEBUG_SPACING << #message << "[FAIL]" << std::endl;}
 	#define __debugVal(message, value) {std::cout << DEBUG_FORMAT << DEBUG_SPACING << #message << value << std::endl;}
 	#define __debugGL(message) {auto e =glGetError(); std::cout << DEBUG_FORMAT << DEBUG_SPACING << #message << std::hex; if(e) std::cout << e; else std::cout << "[OK]"; std::cout << std::dec << std::endl;}
 #else

@@ -1,5 +1,6 @@
 #include "core/inputEngine.h"
 #include "graphics/graphics.h"
+#include "core/gameEngine.h"
 
 using namespace core::input;
 
@@ -82,6 +83,14 @@ bool core::inputEngine::postMsg(UINT msg, WPARAM wParam, LPARAM lParam){
 		mousex = GET_X_LPARAM(lParam);
 		mousey = GET_Y_LPARAM(lParam);
 		return true;
+	
+	case WM_DESTROY:
+		std::cout << "WM_DESTROY posted...\nExiting\n";
+		core::engine::gameEngine::teardown();
+	
+	case WM_CLOSE:
+		std::cout << "WM_CLOSE posted...\nExiting\n";
+		core::engine::gameEngine::teardown();
 	}
 	return false;
 }
@@ -122,5 +131,6 @@ bool core::inputEngine::shift;
 bool core::inputEngine::ctrl;
 int core::inputEngine::mousex;
 int core::inputEngine::mousey;
+flatMouse* core::inputEngine::highlight;
 bool settings::raw;
 bool settings::hwpointer;

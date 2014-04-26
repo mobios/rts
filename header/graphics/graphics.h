@@ -50,8 +50,8 @@ namespace graphics{
 			float aspcy;
 		};
 	}
-	float normalizeX(short int x);
-	float normalizeY(short int y);
+	float normalizeX(short int);
+	float normalizeY(short int);
 }
 
 #endif

@@ -6,7 +6,6 @@
 #include <list>
 #include <iostream>
 
-
 namespace core{
 	namespace input{
 		struct flatMouse{
