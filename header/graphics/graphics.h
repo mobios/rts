@@ -34,7 +34,6 @@ namespace graphics{
 			
 			static HGLRC hGLrc;
 			
-			
 			static void makeOldContext();
 			static void makeNewContext();
 			static void loadExtensions();
@@ -42,7 +41,11 @@ namespace graphics{
 			static void setup();
 			
 			static GLuint loadShader(std::string, GLenum);
+			static GLuint registerTexture(std::string, std::size_t, void*);
 			static void setupProgram();
+			static registerModel(model*);
+		private:
+			static std::vector<model> models;
 		};
 		
 		struct settings{
@@ -50,6 +53,15 @@ namespace graphics{
 			float aspcy;
 		};
 	}
+	
+	struct model{
+		std::string texUuid;
+		GLuint texID;
+		GLuint modelID;
+		model(float*);
+		~model();
+	}
+	
 	float normalizeX(short int);
 	float normalizeY(short int);
 }
