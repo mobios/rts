@@ -2,6 +2,7 @@
 #include "graphics/graphics.h"
 #include "core/inputEngine.h"
 #include "global.h"
+#define PARAM_DEBUG
 
 using namespace core::engine;
 
@@ -14,6 +15,7 @@ LRESULT CALLBACK WndProcStatic(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam
 void gameEngine::error(std::string exitmsg){
 	#ifdef PARAM_DEBUG
 		std::cout << exitmsg;
+		asm ("int3");
 	#else
 		MessageBox(NULL, exitmsg.c_str(), "Error", MB_OK | MB_ICONERROR);
 	#endif
@@ -26,8 +28,8 @@ void gameEngine::error(bool flag, std::string exitmsg){
 }
 
 void gameEngine::setup(HINSTANCE hInst){
-	graphics::engine::windowEngine::setup(hInst, WndProcStatic);
-	graphics::engine::renderEngine::setup();
+	settings::fov = 90.f;
+	settings::aspectRatio = 4.0f/3.0f;
 	#ifdef PARAM_DEBUG
 		AllocConsole();
 		HANDLE consoleOut = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -37,6 +39,9 @@ void gameEngine::setup(HINSTANCE hInst){
 		std::cout.clear();
 		std::cout << "RUNNING\n";
 	#endif
+	graphics::engine::windowEngine::setup(hInst, WndProcStatic);
+	graphics::engine::renderEngine::setup();
+	std::cout <<"Sizeof gpuVertex: " << sizeof(graphics::gpuVertex) << std::string("\nSizeof sequential glm::vec; ") << sizeof(glm::vec3)*2 + sizeof(glm::vec2); 
 }
 
 void gameEngine::run(){
@@ -61,11 +66,29 @@ void gameEngine::input(){
 	}
 }
 
+void gameEngine::registerInstance(instance* instanceParam){
+	instances.push_back(instanceParam);
+}
+
 void gameEngine::teardown(int xit){
 	#ifdef PARAM_DEBUG
 		FreeConsole();
 	#endif
 	exit(xit);
+}
+
+instance::instance(std::string* modelUuid, bool unused){
+	modelCpuOffset = graphics::engine::renderEngine::lookupModel(modelUuid);
+	modelMatrix = glm::mat4(1.0f);
+	dynamic = true;
+	instanceVectorOffset = -1;
+	gameEngine::registerInstance(new instance(*this));
+	dynamic = false;	
+}
+
+instance::~instance(){
+	if(dynamic)
+		delete this;
 }
 
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow){
@@ -74,3 +97,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	gameEngine::run();
 }
 
+//Static reservations
+std::vector<instance*> gameEngine::instances;
+float core::settings::fov;
+float core::settings::aspectRatio;

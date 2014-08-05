@@ -63,7 +63,7 @@ bool core::inputEngine::postMsg(UINT msg, WPARAM wParam, LPARAM lParam){
 	case WM_MOUSEMOVE:
 		std::cout << "X: " << GET_X_LPARAM(lParam) << "  Y: " << GET_Y_LPARAM(lParam) << std::endl;
 		checkModify(wParam);
-		if(settings::getRaw())
+		if(input::settings::getRaw())
 			return false;
 		
 		if(highlight != NULL && !highlight->inbounds(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)))
@@ -77,7 +77,7 @@ bool core::inputEngine::postMsg(UINT msg, WPARAM wParam, LPARAM lParam){
 			}
 		}
 		
-		if(settings::getHwpointer())
+		if(input::settings::getHwpointer())
 			return true;
 		
 		mousex = GET_X_LPARAM(lParam);

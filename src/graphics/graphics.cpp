@@ -2,6 +2,7 @@
 #include "graphics/glWrapper.h"
 #include "core/gameEngine.h"
 #include "global.h"
+#include <iostream>
 
 using namespace graphics::engine;
 
@@ -162,47 +163,25 @@ void renderEngine::setup(){
 	makeOldContext();
 	loadExtensions();
 	makeNewContext();
+	
+	view = glm::lookAt(glm::vec3(4,3,3), //Camera position
+						glm::vec3(0,0,0), //Look at position
+						glm::vec3(0,-1,0));
+						
+	projection = glm::perspective(core::settings::fov, core::settings::aspectRatio, 0.1f, 100.f);
+	setupVertexAttributeArray();
+	setupProgram();
 }
 
-GLuint renderEngine::loadShader(std::string spathparam, GLenum shaderType){
-	const GLuint shaderID = glCreateShader(shaderType);
-	std::string shaderSource;
-	std::ifstream shaderFile(spathparam, std::ios::in);
-	
-	if(!shaderFile.is_open())
-		core::engine::gameEngine::error("File I/O error for shader at path: " + spathparam);
-		
-	shaderFile.seekg(0,std::ios_base::end);
-	std::streampos shaderFileSize = shaderFile.tellg();
-	shaderFile.seekg(0,std::ios_base::beg);
-	
-	char* shaderString = (char*) malloc(shaderFileSize);
-	shaderFile.read(shaderString, shaderFileSize);
-	
-	glShaderSource(shaderID, 1, (const char**)&shaderString, NULL);
-	glCompileShader(shaderID);
-	
-	GLint compResult = GL_TRUE;
-	glGetShaderiv(shaderID, GL_COMPILE_STATUS, &compResult);
-	
-	if(compResult == GL_FALSE){
-		std::size_t shaderLogLength;
-		glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, (int*)&shaderLogLength);
-		
-		char* logContents = (char*) malloc(shaderLogLength);
-		glGetShaderInfoLog(shaderID, shaderLogLength, (int*)&shaderLogLength, logContents);
-		logContents[shaderLogLength-1] = 0;
-		std::string errormsg = "Shader at path: " + spathparam + " could not compile. \n Error: \n\n" + logContents;
-		free(logContents);
-		core::engine::gameEngine::error(errormsg);
-	}
-	free(shaderString);
+void renderEngine::setupVertexAttributeArray(){
+	glGenVertexArrays(1, &vertexArrayID);
+	glBindVertexArray(vertexArrayID);
 }
-	
+
 void renderEngine::setupProgram(){
 	auto glProgram = glCreateProgram();
-	glAttachShader(glProgram, loadShader("fragment.glsl", GL_FRAGMENT_SHADER));
-	glAttachShader(glProgram, loadShader("vertex.glsl", GL_VERTEX_SHADER));
+	glAttachShader(glProgram, loadShader("resources/shaders/fragment.glsl", GL_FRAGMENT_SHADER));
+	glAttachShader(glProgram, loadShader("resources/shaders/vertex.glsl", GL_VERTEX_SHADER));
 	glLinkProgram(glProgram);
 	
 	GLint programResult = GL_TRUE;
@@ -225,6 +204,89 @@ void renderEngine::setupProgram(){
 	glDisable(GL_DEPTH_TEST);
 }
 
+void renderEngine::setupVertexBuffer(){
+	std::size_t memOffset = 0;
+	
+	for(auto &model : models){
+		model->gpuOffset = memOffset;
+		std::size_t memOverflowCheck = memOffset;
+		if(memOverflowCheck < (memOffset += model->dataSize * sizeof(glm::vec3)))
+			core::engine::gameEngine::error("Buffer overflow.\nGraphics.cpp LN" + __LINE__);
+	};
+	
+	glGenBuffers(1, &vertexBufferID);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
+	glBufferData(GL_ARRAY_BUFFER, memOffset, NULL, GL_STATIC_DRAW);
+}
+
+GLuint renderEngine::loadShader(std::string spathparam, GLenum shaderType){
+	const GLuint shaderID = glCreateShader(shaderType);
+	std::string shaderSource;
+	std::ifstream shaderFile(spathparam, std::ios::in | std::ios::binary);
+	
+	if(!shaderFile.is_open())
+		core::engine::gameEngine::error("File I/O error for shader at path: " + spathparam);
+		
+	shaderFile.seekg(0,std::ios_base::end);
+	int shaderFileSize = shaderFile.tellg();
+	shaderFile.seekg(0,std::ios_base::beg);
+	
+	char* shaderString = (char*) malloc(shaderFileSize+1);
+	shaderFile.read(shaderString, shaderFileSize);
+	shaderString[shaderFileSize] = '\0';
+	
+	glShaderSource(shaderID, 1, (const char**)&shaderString, NULL);
+	glCompileShader(shaderID);
+	
+	GLint compResult = GL_TRUE;
+	glGetShaderiv(shaderID, GL_COMPILE_STATUS, &compResult);
+	
+	if(compResult == GL_FALSE){
+		std::cout << "Fsize: " << shaderFileSize << std::endl << shaderString[shaderFileSize-4] << std::endl;
+		std::cout << shaderString << std::endl;
+		std::size_t shaderLogLength;
+		glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, (int*)&shaderLogLength);
+		
+		char* logContents = (char*) malloc(shaderLogLength);
+		glGetShaderInfoLog(shaderID, shaderLogLength, (int*)&shaderLogLength, logContents);
+		logContents[shaderLogLength-1] = 0;
+		std::string errormsg = "Shader at path: " + spathparam + " could not compile. \n Error: \n\n" + logContents;
+		free(logContents);
+		core::engine::gameEngine::error(errormsg);
+	}
+	free(shaderString);
+	return shaderID;
+}
+	
+void graphics::engine::renderEngine::registerModel(model* tModel){
+	tModel->cpuOffset = models.size();
+	models.push_back(tModel);
+}
+
+std::size_t graphics::engine::renderEngine::lookupModel(std::string* uuidParam){
+	return 0;
+	bool found = false;
+	std::size_t offset;
+	for(offset =0; offset < models.size(); offset++){
+//		if(models[offset]->uuid.equal(*uuidParam)){		//TODO: Will not work. c_str and what not
+			found = true;
+			break;
+//		}
+	}
+	if(!found)
+		core::engine::gameEngine::error(std::string("Search for nonloaded model with uuid: ") + *uuidParam);
+	
+	return offset;
+}
+
+graphics::model::model(GLuint texIDParam, std::vector<gpuVector>* data){
+	texID = texIDParam;
+	if(vertices->size() != UVs->size() != norms->size())
+		core::engine::gameEngine::error("Error loading models -- size of vertices std::vector mismatch: Error in graphics.cpp LN " + __LINE__);
+	
+	dataSize = vertices->size() * sizeof(glm::vec3);
+}
+
 float graphics::normalizeX(short int x){return 0.f;};
 float graphics::normalizeY(short int x){return 0.f;};
 
@@ -235,3 +297,9 @@ HDC windowEngine::hDC;
 bool renderEngine::funcload;
 bool renderEngine::context;
 HGLRC renderEngine::hGLrc;
+
+GLuint renderEngine::vertexArrayID;
+GLuint renderEngine::vertexBufferID;
+std::vector<graphics::model*> renderEngine::models;
+glm::mat4 renderEngine::view;
+glm::mat4 renderEngine::projection;
