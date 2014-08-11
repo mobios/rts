@@ -27,6 +27,7 @@ namespace core{
 			static void setup(HINSTANCE);
 			static void run();
 			static void input();
+			static void render();
 			static void registerInstance(instance*);
 			static void teardown(int xit = 0);
 		};
@@ -36,7 +37,9 @@ namespace core{
 			std::size_t modelCpuOffset;
 			std::size_t instanceVectorOffset;
 			
-			instance(std::string*, bool unused = false);
+			void render();
+			
+			instance(const char*, bool unused = false);
 			~instance();
 		private:
 			bool dynamic;

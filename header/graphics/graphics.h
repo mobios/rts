@@ -43,30 +43,46 @@ namespace graphics{
 			static constexpr HDC* hDC = &windowEngine::hDC;
 			static HGLRC hGLrc;
 			
-			static GLuint vertexArrayID;
-			static GLuint vertexBufferID;
-			
-			static glm::mat4 view;
-			static glm::mat4 projection;
-			
 			static void makeOldContext();
 			static void makeNewContext();
 			static void loadExtensions();
 			static void makeCurrent(const HDC, const bool erase = false);
 			
+			static void swapBuffers(){SwapBuffers(*hDC);};
+			
 			static void setup();
 			static void setupVertexAttributeArray();
 			static void setupProgram();
 			static void setupVertexBuffer();
-			static void finalizeRenderEngine();
+			static void populateVertexBuffer();
 			
 			static GLuint loadShader(std::string, GLenum);
 			static GLuint registerTexture(std::string, std::size_t, void*);
-			static void registerModel(model*);
-			static std::size_t lookupModel(std::string*);
+			static void registerModel(model);
+			static std::size_t lookupModel(const char*);
+			static void renderModel(std::size_t, glm::mat4*);
+			
+			static const glm::mat4 getViewMatrix(){return view;};
+			static const glm::mat4 getProjectionMatrix(){return projection;};
+						
+			class uniformHandles{
+				friend struct renderEngine;
+				static GLuint textureSampler;
+				static GLuint MVPmatrix;
+			public:
+				static GLuint getTextureSampler(){return textureSampler;};
+				static GLuint getMVPmatrix(){return MVPmatrix;};
+			};
 			
 		private:
-			static std::vector<model*> models;
+			static std::vector<model> models;
+			static GLuint programID;
+			
+			static GLuint vertexArrayID;
+			static GLuint vertexBufferID;
+			
+			static glm::mat4 view;
+			static glm::mat4 projection;
 		};
 	}
 	
@@ -76,8 +92,14 @@ namespace graphics{
 		GLuint gpuOffset;
 		std::size_t cpuOffset;
 		std::size_t dataSize;
-		model(GLuint, std::vector<gpuVertex>*);
-		~model();
+		
+		std::vector<graphics::gpuVertex> getData(){return data;};
+		void releaseData(){data.clear();};
+		
+		void render(glm::mat4*);
+		
+		model(GLuint, std::vector<graphics::gpuVertex>);
+		std::vector<graphics::gpuVertex> data;
 	};
 	
 	struct gpuVertex{
@@ -90,4 +112,5 @@ namespace graphics{
 	float normalizeY(short int);
 }
 
+extern std::ostream& operator<<(std::ostream& os, const graphics::gpuVertex& gV);
 #endif

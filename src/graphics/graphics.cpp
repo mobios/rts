@@ -1,5 +1,6 @@
 #include "graphics/graphics.h"
 #include "graphics/glWrapper.h"
+#include "graphics/objectLoader.h"
 #include "core/gameEngine.h"
 #include "global.h"
 #include <iostream>
@@ -45,8 +46,8 @@ bool windowEngine::createWindow(HINSTANCE hInstance, WNDPROC wndProc){
 						 WS_OVERLAPPEDWINDOW,
 						 CW_USEDEFAULT,
 						 CW_USEDEFAULT,
-						 CW_USEDEFAULT,
-						 CW_USEDEFAULT,
+						 800,
+						 600,
 						 NULL,
 						 NULL,
 						 hInstance,
@@ -77,7 +78,6 @@ void renderEngine::makeOldContext(){
 	pfd.cColorBits = 32;
 	pfd.cDepthBits = 32;
 	pfd.iLayerType = PFD_MAIN_PLANE;
-	
 	int nPixelFormat = ChoosePixelFormat(*hDC, &pfd);
 	core::engine::gameEngine::error(nPixelFormat, "Unable to choose pixel format.");
 	
@@ -106,6 +106,9 @@ void renderEngine::makeNewContext(){
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 	__debugMsg(OpenGL 3.1 context creation);
+	
+	glViewport(0,0,800,600);
+	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 }
 
 void renderEngine::loadExtensions(){
@@ -123,6 +126,7 @@ void renderEngine::loadExtensions(){
 	__loadGL(glGenBuffers, PFNGLGENBUFFERSPROC);
 	__loadGL(glBindBuffer, PFNGLBINDBUFFERPROC);
 	__loadGL(glBufferData, PFNGLBUFFERDATAPROC);
+	__loadGL(glBufferSubData, PFNGLBUFFERSUBDATAPROC);
 	__loadGL(glEnableVertexAttribArray, PFNGLENABLEVERTEXATTRIBARRAYPROC);
 	__loadGL(glVertexAttribPointer, PFNGLVERTEXATTRIBPOINTERPROC);
 	__loadGL(glDisableVertexAttribArray, PFNGLDISABLEVERTEXATTRIBARRAYPROC);
@@ -140,6 +144,10 @@ void renderEngine::loadExtensions(){
 	__loadGL(glUseProgram, PFNGLUSEPROGRAMPROC);
 	__loadGL(glGenVertexArrays, PFNGLGENVERTEXARRAYSPROC);
 	__loadGL(glBindVertexArray, PFNGLBINDVERTEXARRAYPROC);
+	__loadGL(glActiveTexture, PFNGLACTIVETEXTUREPROC);
+	__loadGL(glUniform1i, PFNGLUNIFORM1IPROC);
+	__loadGL(glUniformMatrix4fv, PFNGLUNIFORMMATRIX4FVPROC);
+	__loadGL(glGetUniformLocation, PFNGLGETUNIFORMLOCATIONPROC);
 	__debugMsg(OpenGL extension loading);
 }
 
@@ -171,6 +179,10 @@ void renderEngine::setup(){
 	projection = glm::perspective(core::settings::fov, core::settings::aspectRatio, 0.1f, 100.f);
 	setupVertexAttributeArray();
 	setupProgram();
+	glActiveTexture(GL_TEXTURE0);
+	asm ("int3");
+	objectLoader::setup();
+	setupVertexBuffer();
 }
 
 void renderEngine::setupVertexAttributeArray(){
@@ -179,44 +191,84 @@ void renderEngine::setupVertexAttributeArray(){
 }
 
 void renderEngine::setupProgram(){
-	auto glProgram = glCreateProgram();
-	glAttachShader(glProgram, loadShader("resources/shaders/fragment.glsl", GL_FRAGMENT_SHADER));
-	glAttachShader(glProgram, loadShader("resources/shaders/vertex.glsl", GL_VERTEX_SHADER));
-	glLinkProgram(glProgram);
+	programID = glCreateProgram();
+	glAttachShader(programID, loadShader("resources/shaders/fragment.glsl", GL_FRAGMENT_SHADER));
+	glAttachShader(programID, loadShader("resources/shaders/vertex.glsl", GL_VERTEX_SHADER));
+	glLinkProgram(programID);
 	
 	GLint programResult = GL_TRUE;
-	glGetProgramiv(glProgram, GL_LINK_STATUS, &programResult);
+	glGetProgramiv(programID, GL_LINK_STATUS, &programResult);
 	
 	if(programResult != GL_TRUE){
 		std::size_t logLength;
-		glGetProgramiv(glProgram, GL_INFO_LOG_LENGTH, (int*)&logLength);
+		glGetProgramiv(programID, GL_INFO_LOG_LENGTH, (int*)&logLength);
 		char* logContents = (char*)malloc(logLength);
-		glGetProgramInfoLog(glProgram, logLength, (int*)&logLength, logContents);
+		glGetProgramInfoLog(programID, logLength, (int*)&logLength, logContents);
 		logContents[logLength-1] = 0;
 		std::string msg = "Main OpenGL program could not link:\n" + std::string(logContents);
 		free(logContents);
 		core::engine::gameEngine::error(msg);
 	}
+	glUseProgram(programID);
+	uniformHandles::MVPmatrix = glGetUniformLocation(programID, "MVP");
+	uniformHandles::textureSampler = glGetUniformLocation(programID, "texSampler");
+	glUniform1i(uniformHandles::textureSampler,0);
+	//glEnable(GL_BLEND);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
-	glDisable(GL_DEPTH_TEST);
+	//glDisable(GL_DEPTH_TEST);
 }
 
 void renderEngine::setupVertexBuffer(){
 	std::size_t memOffset = 0;
+	std::size_t index = 0;
 	
 	for(auto &model : models){
-		model->gpuOffset = memOffset;
+		model.gpuOffset = memOffset;
+		model.cpuOffset = index;
+		std::cout << "Register Model offset " << memOffset ;
 		std::size_t memOverflowCheck = memOffset;
-		if(memOverflowCheck < (memOffset += model->dataSize * sizeof(glm::vec3)))
-			core::engine::gameEngine::error("Buffer overflow.\nGraphics.cpp LN" + __LINE__);
+		memOffset += model.dataSize;
+		std::cout << "\n  Size: " << model.dataSize << std::endl;
+		//if(memOverflowCheck < (memOffset += model.dataSize))
+		//	core::engine::gameEngine::error("Buffer overflow.\nGraphics.cpp LN" + __LINE__);
+		index++;
 	};
 	
 	glGenBuffers(1, &vertexBufferID);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
 	glBufferData(GL_ARRAY_BUFFER, memOffset, NULL, GL_STATIC_DRAW);
+	
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(0,	
+	                      3,
+						  GL_FLOAT,
+						  GL_FALSE,
+						  3+2+3,
+						  (void*)0);
+						  
+	glVertexAttribPointer(1,	
+	                      2,
+						  GL_FLOAT,
+						  GL_FALSE,
+						  3+2+3,
+						  (void*)3);
+						  
+	glVertexAttribPointer(2,
+						  3,
+						  GL_FLOAT,
+						  GL_FALSE,
+						  3+2+3,
+						  (void*)5);
+						  
+}
+
+void renderEngine::populateVertexBuffer(){
+	std::size_t offset = 0;
+	for(auto &model : models){
+		glBufferSubData(GL_ARRAY_BUFFER, model.gpuOffset, model.dataSize, &((model.data)[0]));
+	}
 }
 
 GLuint renderEngine::loadShader(std::string spathparam, GLenum shaderType){
@@ -258,12 +310,21 @@ GLuint renderEngine::loadShader(std::string spathparam, GLenum shaderType){
 	return shaderID;
 }
 	
-void graphics::engine::renderEngine::registerModel(model* tModel){
-	tModel->cpuOffset = models.size();
+void graphics::engine::renderEngine::registerModel(model tModel){
+	__debugMsg(register model);
+	std::cout << "Model count: " << models.size() << "\nUtil" << util::itos(models.size()) << std::endl;
+	tModel.cpuOffset = models.size();
 	models.push_back(tModel);
+	asm ("int3");
 }
 
-std::size_t graphics::engine::renderEngine::lookupModel(std::string* uuidParam){
+void graphics::engine::renderEngine::renderModel(std::size_t offset, glm::mat4* matrix){
+	if(offset >= models.size())
+		core::engine::gameEngine::error("Tried finding model at postition " + util::itos(offset) + "\nOnly " + util::itos(models.size()) + " models loaded");
+	models[offset].render(matrix);
+}
+
+std::size_t graphics::engine::renderEngine::lookupModel(const char* uuidParam){
 	return 0;
 	bool found = false;
 	std::size_t offset;
@@ -279,12 +340,34 @@ std::size_t graphics::engine::renderEngine::lookupModel(std::string* uuidParam){
 	return offset;
 }
 
-graphics::model::model(GLuint texIDParam, std::vector<gpuVector>* data){
+void graphics::model::render(glm::mat4* modelPosition){
+	glm::mat4 cpuMVP = renderEngine::getProjectionMatrix() * renderEngine::getViewMatrix() * (*modelPosition);
+	glUniformMatrix4fv(renderEngine::uniformHandles::getMVPmatrix(), 1, GL_FALSE, &cpuMVP[0][0]);
+	glDrawArrays(GL_TRIANGLES, gpuOffset, dataSize);
+}
+
+graphics::model::model(GLuint texIDParam, std::vector<graphics::gpuVertex> dataParam){
 	texID = texIDParam;
-	if(vertices->size() != UVs->size() != norms->size())
-		core::engine::gameEngine::error("Error loading models -- size of vertices std::vector mismatch: Error in graphics.cpp LN " + __LINE__);
+
+	dataSize = dataParam.size() * sizeof(gpuVertex);
 	
-	dataSize = vertices->size() * sizeof(glm::vec3);
+	data = dataParam;
+}
+
+std::ostream& operator<<(std::ostream& os, const graphics::gpuVertex &gV){
+	os << "Vertex" << std::endl;
+	os << "--x: " << gV.vertex.x << std::endl;
+	os << "--y: " << gV.vertex.y << std::endl;
+	os << "--z: " << gV.vertex.z << std::endl << std::endl;
+	
+	os << "UV" << std::endl;
+	os << "--S" << gV.uv.x << std::endl;
+	os << "--T" << gV.uv.y << std::endl << std::endl;
+	
+	os << "Normal" << std::endl;
+	os << "--x: " << gV.normal.x << std::endl;
+	os << "--y: " << gV.normal.y << std::endl;
+	os << "--z: " << gV.normal.z << std::endl << std::endl;
 }
 
 float graphics::normalizeX(short int x){return 0.f;};
@@ -298,8 +381,12 @@ bool renderEngine::funcload;
 bool renderEngine::context;
 HGLRC renderEngine::hGLrc;
 
+GLuint renderEngine::uniformHandles::textureSampler;
+GLuint renderEngine::uniformHandles::MVPmatrix;
+
+GLuint renderEngine::programID;
 GLuint renderEngine::vertexArrayID;
 GLuint renderEngine::vertexBufferID;
-std::vector<graphics::model*> renderEngine::models;
+std::vector<graphics::model> renderEngine::models;
 glm::mat4 renderEngine::view;
 glm::mat4 renderEngine::projection;

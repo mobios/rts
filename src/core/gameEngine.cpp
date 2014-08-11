@@ -41,12 +41,13 @@ void gameEngine::setup(HINSTANCE hInst){
 	#endif
 	graphics::engine::windowEngine::setup(hInst, WndProcStatic);
 	graphics::engine::renderEngine::setup();
-	std::cout <<"Sizeof gpuVertex: " << sizeof(graphics::gpuVertex) << std::string("\nSizeof sequential glm::vec; ") << sizeof(glm::vec3)*2 + sizeof(glm::vec2); 
+	instance first("a");
 }
 
 void gameEngine::run(){
 	while(1){
 		input();
+		render();
 	}
 	teardown();				// Semantics
 }
@@ -66,6 +67,14 @@ void gameEngine::input(){
 	}
 }
 
+void gameEngine::render(){
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	for(auto &object : instances){
+		object->render();
+	}
+	graphics::engine::renderEngine::swapBuffers();
+}
+
 void gameEngine::registerInstance(instance* instanceParam){
 	instances.push_back(instanceParam);
 }
@@ -77,7 +86,11 @@ void gameEngine::teardown(int xit){
 	exit(xit);
 }
 
-instance::instance(std::string* modelUuid, bool unused){
+void instance::render(){
+	graphics::engine::renderEngine::renderModel(modelCpuOffset, &modelMatrix);
+}
+
+instance::instance(const char* modelUuid, bool unused){
 	modelCpuOffset = graphics::engine::renderEngine::lookupModel(modelUuid);
 	modelMatrix = glm::mat4(1.0f);
 	dynamic = true;
