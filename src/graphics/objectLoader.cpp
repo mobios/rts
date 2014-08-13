@@ -119,5 +119,6 @@ GLuint graphics::objectLoader::loadBMP(const char *path){
 
 void graphics::objectLoader::setup(){
 	graphics::engine::renderEngine::registerModel(load("resources/capsule.obj", "resources/capsule0.bmp"));
+	graphics::engine::renderEngine::setupVertexBuffer();
 	graphics::engine::renderEngine::populateVertexBuffer();
 }

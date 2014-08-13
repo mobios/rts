@@ -174,15 +174,14 @@ void renderEngine::setup(){
 	
 	view = glm::lookAt(glm::vec3(4,3,3), //Camera position
 						glm::vec3(0,0,0), //Look at position
-						glm::vec3(0,-1,0));
+						glm::vec3(0,1,0));
 						
 	projection = glm::perspective(core::settings::fov, core::settings::aspectRatio, 0.1f, 100.f);
 	setupVertexAttributeArray();
 	setupProgram();
 	glActiveTexture(GL_TEXTURE0);
-	asm ("int3");
+	glEnable(GL_TEXTURE_2D);
 	objectLoader::setup();
-	setupVertexBuffer();
 }
 
 void renderEngine::setupVertexAttributeArray(){
@@ -315,7 +314,6 @@ void graphics::engine::renderEngine::registerModel(model tModel){
 	std::cout << "Model count: " << models.size() << "\nUtil" << util::itos(models.size()) << std::endl;
 	tModel.cpuOffset = models.size();
 	models.push_back(tModel);
-	asm ("int3");
 }
 
 void graphics::engine::renderEngine::renderModel(std::size_t offset, glm::mat4* matrix){

@@ -15,5 +15,5 @@ object/graphics.o: header/graphics/glWrapper.h header/graphics/graphics.h src/gr
 object/loader.o: header/graphics/graphics.h header/graphics/objectLoader.h src/graphics/objectLoader.cpp
 	g++ -Iheader -c -std=c++0x src/graphics/objectLoader.cpp -o object/loader.o -g
 
-object/utils.o: header/utils/util.h src/utils/util.cpp
+object/util.o: header/utils/util.h src/utils/util.cpp
 	g++ -Iheader -c -std=c++0x src/utils/util.cpp -o object/util.o -g

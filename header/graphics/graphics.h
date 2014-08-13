@@ -33,7 +33,7 @@ namespace graphics{
 			static bool createWindow(const HINSTANCE, const WNDPROC);
 			static void makeAvailable();
 			static HDC getHDC();
-			static HWND getHWND();
+			static HWND getHWND(){return hWnd;};
 			static void setup(const HINSTANCE, const WNDPROC);
 		};
 		
@@ -64,6 +64,8 @@ namespace graphics{
 			
 			static const glm::mat4 getViewMatrix(){return view;};
 			static const glm::mat4 getProjectionMatrix(){return projection;};
+			
+			static void setViewMatrix(glm::mat4* vParam){view = *vParam;};
 						
 			class uniformHandles{
 				friend struct renderEngine;

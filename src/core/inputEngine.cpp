@@ -19,8 +19,15 @@ bool flatMouse::inbounds(signed short x, signed short y){
 
 bool core::inputEngine::postMsg(UINT msg, WPARAM wParam, LPARAM lParam){
 	switch(msg){
-	case WM_LBUTTONDOWN:
-		std::cout << "Lclick\n";
+	case WM_KEYDOWN:
+		keys[(unsigned char)wParam] = true;
+		return true;
+		
+	case WM_KEYUP:
+		keys[(unsigned char)wParam] = false;
+		return true;
+		
+	case WM_LBUTTONDOWN:;
 		checkModify(wParam);
 		for(flatMouse* mouseObj : mouseEvents){
 			if(mouseObj->inbounds(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam))){					
@@ -61,7 +68,10 @@ bool core::inputEngine::postMsg(UINT msg, WPARAM wParam, LPARAM lParam){
 		return false;
 		
 	case WM_MOUSEMOVE:
-		std::cout << "X: " << GET_X_LPARAM(lParam) << "  Y: " << GET_Y_LPARAM(lParam) << std::endl;
+		if(moved){
+			moved = false;
+			return true;
+		}
 		checkModify(wParam);
 		if(input::settings::getRaw())
 			return false;
@@ -82,6 +92,8 @@ bool core::inputEngine::postMsg(UINT msg, WPARAM wParam, LPARAM lParam){
 		
 		mousex = GET_X_LPARAM(lParam);
 		mousey = GET_Y_LPARAM(lParam);
+		centerCursor();
+		core::engine::gameEngine::moveAngles(float(mousey-300)/1000, float(mousex-400)/1000);
 		return true;
 	
 	case WM_DESTROY:
@@ -99,16 +111,12 @@ void core::inputEngine::registerMouse(flatMouse* mobj){
 	mouseEvents.push_back(mobj);
 }
 
-void core::inputEngine::registerKey(keyObj* kobj){
-	keyEvents.push_back(kobj);
+bool core::inputEngine::queryKey(unsigned char keyQuery){
+	return keys[keyQuery];
 }
 
 void core::inputEngine::notifyDead(flatMouse* mobj){
 	mouseEvents.remove(mobj);
-}
-
-void core::inputEngine::removeKey(keyObj* kobj){
-	keyEvents.remove(kobj);
 }
 
 void core::inputEngine::checkModify(WPARAM wParam){
@@ -123,14 +131,22 @@ void core::inputEngine::checkModify(WPARAM wParam){
 		ctrl = false;
 }
 
-
+void core::inputEngine::centerCursor(){
+	POINT cursor;
+	cursor.x = 400;
+	cursor.y = 300;
+	ClientToScreen(graphics::engine::windowEngine::getHWND(),&cursor);
+	SetCursorPos(cursor.x, cursor.y);
+	moved = true;
+}
 
 std::list<flatMouse*> core::inputEngine::mouseEvents;
-std::list<keyObj*> core::inputEngine::keyEvents;
 bool core::inputEngine::shift;
 bool core::inputEngine::ctrl;
+bool core::inputEngine::moved;
 int core::inputEngine::mousex;
 int core::inputEngine::mousey;
 flatMouse* core::inputEngine::highlight;
+bool core::inputEngine::keys[256];
 bool settings::raw;
 bool settings::hwpointer;

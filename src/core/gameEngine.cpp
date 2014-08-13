@@ -28,8 +28,14 @@ void gameEngine::error(bool flag, std::string exitmsg){
 }
 
 void gameEngine::setup(HINSTANCE hInst){
-	settings::fov = 90.f;
+	settings::fov = 45.f;
 	settings::aspectRatio = 4.0f/3.0f;
+	
+	cameraLook.x = -0.616;
+	cameraLook.y = -2.255;
+	
+	cameraPos = glm::vec3(4,3,3);
+	
 	#ifdef PARAM_DEBUG
 		AllocConsole();
 		HANDLE consoleOut = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -42,10 +48,12 @@ void gameEngine::setup(HINSTANCE hInst){
 	graphics::engine::windowEngine::setup(hInst, WndProcStatic);
 	graphics::engine::renderEngine::setup();
 	instance first("a");
+	util::timing::setup();
 }
 
 void gameEngine::run(){
 	while(1){
+		util::timing::advance();
 		input();
 		render();
 	}
@@ -65,6 +73,18 @@ void gameEngine::input(){
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
+	
+	if(core::inputEngine::queryKey('W'))
+		moveCameraF(200*util::timing::deltaTime());
+	
+	if(core::inputEngine::queryKey('S'))
+		moveCameraF(-200*util::timing::deltaTime());
+		
+	if(core::inputEngine::queryKey('D'))
+		moveCameraR(200*util::timing::deltaTime());
+		
+	if(core::inputEngine::queryKey('A'))
+		moveCameraR(-200*util::timing::deltaTime());
 }
 
 void gameEngine::render(){
@@ -84,6 +104,38 @@ void gameEngine::teardown(int xit){
 		FreeConsole();
 	#endif
 	exit(xit);
+}
+
+void gameEngine::moveAngles(float deltaVertical, float deltaHorizontal){
+	cameraLook.x += deltaVertical;
+	cameraLook.y += deltaHorizontal;
+	glm::vec3 dir(std::cos(cameraLook.x) * std::sin(cameraLook.y), std::sin(cameraLook.x), std::cos(cameraLook.x) * std::cos(cameraLook.y));
+	cameraDirection = dir;
+	genView();
+}
+
+void gameEngine::moveCameraF(float deltaForwards){
+	cameraPos += cameraDirection * deltaForwards;
+	genView();
+}
+
+void gameEngine::moveCameraR(float deltaRight){
+	glm::vec3 right(std::sin(cameraLook.y - M_PI/2.0f),
+	                0,
+					std::cos(cameraLook.y - M_PI/2.0f));
+	cameraPos += right*deltaRight;
+	genView();
+}
+
+void gameEngine::genView(){
+	std::cout << "Camera Pos:\nX: " << cameraPos.x << "\nY: " << cameraPos.y << "\nZ:" << cameraPos.z << std::endl;
+	//std::cout << "Camera Direction:\nX: " << cameraDirection.x << "\nY: " << cameraDirection.y << "\nZ:" << cameraDirection.z << std::endl;
+	
+	std::cout << "dV " << cameraLook.x << "   dH " << cameraLook.y << std::endl;
+	glm::mat4 view = glm::lookAt(cameraPos,
+	                             cameraPos + cameraDirection,
+								 glm::vec3(0,1,0));
+	graphics::engine::renderEngine::setViewMatrix(&view);
 }
 
 void instance::render(){
@@ -110,7 +162,13 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	gameEngine::run();
 }
 
+double M_PI = 4 * std::atan(1);
+
 //Static reservations
 std::vector<instance*> gameEngine::instances;
+glm::vec3 core::engine::gameEngine::cameraPos;
+glm::vec2 core::engine::gameEngine::cameraLook;
+glm::vec3 core::engine::gameEngine::cameraDirection;
+glm::vec3 core::engine::gameEngine::cameraRight;
 float core::settings::fov;
 float core::settings::aspectRatio;
