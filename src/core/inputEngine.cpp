@@ -49,6 +49,7 @@ bool core::inputEngine::postMsg(UINT msg, WPARAM wParam, LPARAM lParam){
 		
 	case WM_RBUTTONDOWN:
 		checkModify(wParam);
+		asm ("int3");
 		for(flatMouse* mouseObj : mouseEvents){
 			if(mouseObj->inbounds(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam))){
 				mouseObj->down_r();

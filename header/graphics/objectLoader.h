@@ -17,7 +17,7 @@
 namespace graphics{
 	class objectLoader{
 	public:
-		static graphics::model load(const char *, const char *);
+		static void load(const char *, const char *);
 		static GLuint loadBMP(const char *);
 		static void setup();
 	};

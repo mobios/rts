@@ -58,7 +58,7 @@ namespace graphics{
 			
 			static GLuint loadShader(std::string, GLenum);
 			static GLuint registerTexture(std::string, std::size_t, void*);
-			static void registerModel(model);
+			static void registerModel(model*);
 			static std::size_t lookupModel(const char*);
 			static void renderModel(std::size_t, glm::mat4*);
 			
@@ -77,7 +77,7 @@ namespace graphics{
 			};
 			
 		private:
-			static std::vector<model> models;
+			static std::vector<model*> models;
 			static GLuint programID;
 			
 			static GLuint vertexArrayID;
@@ -91,9 +91,10 @@ namespace graphics{
 	struct model{
 		std::string uuid;
 		GLuint texID;
-		GLuint gpuOffset;
-		std::size_t cpuOffset;
-		std::size_t dataSize;
+		long long gpuBufferOffset;
+		std::size_t vectorOffset;
+		std::size_t indices;
+		std::size_t bytes;
 		
 		std::vector<graphics::gpuVertex> getData(){return data;};
 		void releaseData(){data.clear();};

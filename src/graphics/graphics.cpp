@@ -219,54 +219,46 @@ void renderEngine::setupProgram(){
 }
 
 void renderEngine::setupVertexBuffer(){
-	std::size_t memOffset = 0;
-	std::size_t index = 0;
+	std::size_t gpuSize = 0;
 	
 	for(auto &model : models){
-		model.gpuOffset = memOffset;
-		model.cpuOffset = index;
-		std::cout << "Register Model offset " << memOffset ;
-		std::size_t memOverflowCheck = memOffset;
-		memOffset += model.dataSize;
-		std::cout << "\n  Size: " << model.dataSize << std::endl;
-		//if(memOverflowCheck < (memOffset += model.dataSize))
-		//	core::engine::gameEngine::error("Buffer overflow.\nGraphics.cpp LN" + __LINE__);
-		index++;
+		model->gpuBufferOffset = gpuSize;
+		gpuSize += model->bytes;
 	};
 	
 	glGenBuffers(1, &vertexBufferID);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
-	glBufferData(GL_ARRAY_BUFFER, memOffset, NULL, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, gpuSize, &((models[0]->data)[0]), GL_STATIC_DRAW);
 	
 	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(0,	
 	                      3,
 						  GL_FLOAT,
 						  GL_FALSE,
-						  3+2+3,
+						  sizeof(graphics::gpuVertex),
 						  (void*)0);
+	glEnableVertexAttribArray(1);
 						  
 	glVertexAttribPointer(1,	
 	                      2,
 						  GL_FLOAT,
 						  GL_FALSE,
-						  3+2+3,
-						  (void*)3);
+						  sizeof(graphics::gpuVertex),
+						  (void*)sizeof(glm::vec3));
+	glEnableVertexAttribArray(2);
 						  
 	glVertexAttribPointer(2,
 						  3,
 						  GL_FLOAT,
 						  GL_FALSE,
-						  3+2+3,
-						  (void*)5);
-						  
+						  sizeof(graphics::gpuVertex),
+						  (void*)(sizeof(glm::vec3)+sizeof(glm::vec2)));
 }
 
 void renderEngine::populateVertexBuffer(){
 	std::size_t offset = 0;
 	for(auto &model : models){
-		glBufferSubData(GL_ARRAY_BUFFER, model.gpuOffset, model.dataSize, &((model.data)[0]));
+		glBufferSubData(GL_ARRAY_BUFFER, model->gpuBufferOffset, model->indices, &((model->data)[0]));
 	}
 }
 
@@ -309,17 +301,15 @@ GLuint renderEngine::loadShader(std::string spathparam, GLenum shaderType){
 	return shaderID;
 }
 	
-void graphics::engine::renderEngine::registerModel(model tModel){
-	__debugMsg(register model);
-	std::cout << "Model count: " << models.size() << "\nUtil" << util::itos(models.size()) << std::endl;
-	tModel.cpuOffset = models.size();
+void graphics::engine::renderEngine::registerModel(model* tModel){
+	tModel->vectorOffset = models.size();
 	models.push_back(tModel);
 }
 
 void graphics::engine::renderEngine::renderModel(std::size_t offset, glm::mat4* matrix){
 	if(offset >= models.size())
 		core::engine::gameEngine::error("Tried finding model at postition " + util::itos(offset) + "\nOnly " + util::itos(models.size()) + " models loaded");
-	models[offset].render(matrix);
+	models[offset]->render(matrix);
 }
 
 std::size_t graphics::engine::renderEngine::lookupModel(const char* uuidParam){
@@ -341,13 +331,14 @@ std::size_t graphics::engine::renderEngine::lookupModel(const char* uuidParam){
 void graphics::model::render(glm::mat4* modelPosition){
 	glm::mat4 cpuMVP = renderEngine::getProjectionMatrix() * renderEngine::getViewMatrix() * (*modelPosition);
 	glUniformMatrix4fv(renderEngine::uniformHandles::getMVPmatrix(), 1, GL_FALSE, &cpuMVP[0][0]);
-	glDrawArrays(GL_TRIANGLES, gpuOffset, dataSize);
+	glDrawArrays(GL_TRIANGLES, gpuBufferOffset, indices);
 }
 
 graphics::model::model(GLuint texIDParam, std::vector<graphics::gpuVertex> dataParam){
 	texID = texIDParam;
 
-	dataSize = dataParam.size() * sizeof(gpuVertex);
+	indices = dataParam.size();
+	bytes = dataParam.size() * sizeof(gpuVertex);
 	
 	data = dataParam;
 }
@@ -385,6 +376,6 @@ GLuint renderEngine::uniformHandles::MVPmatrix;
 GLuint renderEngine::programID;
 GLuint renderEngine::vertexArrayID;
 GLuint renderEngine::vertexBufferID;
-std::vector<graphics::model> renderEngine::models;
+std::vector<graphics::model*> renderEngine::models;
 glm::mat4 renderEngine::view;
 glm::mat4 renderEngine::projection;

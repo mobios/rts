@@ -7,25 +7,22 @@ std::string util::itos(long num){
 }
 
 float util::timing::deltaTime(){
-	long long time;
-	LARGE_INTEGER time_long;
-	QueryPerformanceCounter(&time_long);
-	time = time_long.QuadPart;
-	long long deltaTime = time - last;
-	return float(deltaTime)/float(freq);
+	return delta;
 }
 
 void util::timing::advance(){
 	LARGE_INTEGER time_long;
 	QueryPerformanceCounter(&time_long);
+	delta = float(time_long.QuadPart - last)/freq;
 	last = time_long.QuadPart;
 }
 
 void util::timing::setup(){
 	LARGE_INTEGER freq_long;
 	QueryPerformanceFrequency(&freq_long);
-	freq = freq_long.QuadPart;
+	freq = float(freq_long.QuadPart);
 }
 
-long long util::timing::freq;
+float util::timing::freq;
+float util::timing::delta;
 long long util::timing::last;

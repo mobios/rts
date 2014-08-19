@@ -75,16 +75,16 @@ void gameEngine::input(){
 	}
 	
 	if(core::inputEngine::queryKey('W'))
-		moveCameraF(200*util::timing::deltaTime());
+		moveCameraF(20*util::timing::deltaTime());
 	
 	if(core::inputEngine::queryKey('S'))
-		moveCameraF(-200*util::timing::deltaTime());
+		moveCameraF(-20*util::timing::deltaTime());
 		
 	if(core::inputEngine::queryKey('D'))
-		moveCameraR(200*util::timing::deltaTime());
+		moveCameraR(20*util::timing::deltaTime());
 		
 	if(core::inputEngine::queryKey('A'))
-		moveCameraR(-200*util::timing::deltaTime());
+		moveCameraR(-20*util::timing::deltaTime());
 }
 
 void gameEngine::render(){
@@ -107,8 +107,8 @@ void gameEngine::teardown(int xit){
 }
 
 void gameEngine::moveAngles(float deltaVertical, float deltaHorizontal){
-	cameraLook.x += deltaVertical;
-	cameraLook.y += deltaHorizontal;
+	cameraLook.x -= deltaVertical;
+	cameraLook.y -= deltaHorizontal;
 	glm::vec3 dir(std::cos(cameraLook.x) * std::sin(cameraLook.y), std::sin(cameraLook.x), std::cos(cameraLook.x) * std::cos(cameraLook.y));
 	cameraDirection = dir;
 	genView();

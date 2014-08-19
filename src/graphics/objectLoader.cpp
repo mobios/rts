@@ -1,6 +1,6 @@
 #include "graphics/objectLoader.h"
 
-graphics::model graphics::objectLoader::load(const char *objPath, const char *texPath){
+void graphics::objectLoader::load(const char *objPath, const char *texPath){
 	std::fstream objFile;
 	std::string objLine;
 	
@@ -72,7 +72,9 @@ graphics::model graphics::objectLoader::load(const char *objPath, const char *te
 		}
 	}
 	
-	return model(loadBMP(texPath), outVertices);
+	auto tempModel = new model(loadBMP(texPath), outVertices);
+	asm ("int3");
+	graphics::engine::renderEngine::registerModel(tempModel);
 }
 
 GLuint graphics::objectLoader::loadBMP(const char *path){
@@ -92,11 +94,11 @@ GLuint graphics::objectLoader::loadBMP(const char *path){
 	unsigned int height = *(int*)&(header[0x16]);
 	unsigned int imageSize = *(int*)&(header[0x22]);
 	
-	if(width = 0 || (width & width-1))
+	if(width == 0 || (width & width-1))
 		core::engine::gameEngine::error("Texture loading failed. Width must be a power of two and nonzero."
 										"found width of " + util::itos(width) + " at path " + *path);
 										
-	if(height = 0 || (height & height-1))
+	if(height == 0 || (height & height-1))
 		core::engine::gameEngine::error("Texture loading failed. Height must be a power of two and nonzero."
 										"found height of " + util::itos(height) + " at path " + *path);
 	
@@ -110,7 +112,7 @@ GLuint graphics::objectLoader::loadBMP(const char *path){
 	GLuint texID;
 	glGenTextures(1, &texID);
 	glBindTexture(GL_TEXTURE_2D, texID);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, texture);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
@@ -118,7 +120,7 @@ GLuint graphics::objectLoader::loadBMP(const char *path){
 }
 
 void graphics::objectLoader::setup(){
-	graphics::engine::renderEngine::registerModel(load("resources/capsule.obj", "resources/capsule0.bmp"));
+	load("resources/capsule.obj", "resources/capsule0.bmp");
 	graphics::engine::renderEngine::setupVertexBuffer();
-	graphics::engine::renderEngine::populateVertexBuffer();
+	//graphics::engine::renderEngine::populateVertexBuffer();
 }

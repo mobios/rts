@@ -9,7 +9,8 @@ namespace util{
 	std::string itos(long);
 	class timing{
 		static long long last;
-		static long long freq;
+		static float freq;
+		static float delta;
 	public:
 		static float deltaTime();
 		static void advance();
