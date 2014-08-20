@@ -47,8 +47,9 @@ void gameEngine::setup(HINSTANCE hInst){
 	#endif
 	graphics::engine::windowEngine::setup(hInst, WndProcStatic);
 	graphics::engine::renderEngine::setup();
-	instance first("a");
+	core::inputEngine::setup();
 	util::timing::setup();
+	instance first("a");
 }
 
 void gameEngine::run(){
@@ -74,17 +75,20 @@ void gameEngine::input(){
 		DispatchMessage(&msg);
 	}
 	
+	if(core::input::settings::captureMouse)
+		return;
+	
 	if(core::inputEngine::queryKey('W'))
-		moveCameraF(20*util::timing::deltaTime());
+		moveCameraF(2*util::timing::deltaTime());
 	
 	if(core::inputEngine::queryKey('S'))
-		moveCameraF(-20*util::timing::deltaTime());
+		moveCameraF(-2*util::timing::deltaTime());
 		
 	if(core::inputEngine::queryKey('D'))
-		moveCameraR(20*util::timing::deltaTime());
+		moveCameraR(2*util::timing::deltaTime());
 		
 	if(core::inputEngine::queryKey('A'))
-		moveCameraR(-20*util::timing::deltaTime());
+		moveCameraR(-2*util::timing::deltaTime());
 }
 
 void gameEngine::render(){
@@ -107,7 +111,7 @@ void gameEngine::teardown(int xit){
 }
 
 void gameEngine::moveAngles(float deltaVertical, float deltaHorizontal){
-	cameraLook.x -= deltaVertical;
+	cameraLook.x += deltaVertical;
 	cameraLook.y -= deltaHorizontal;
 	glm::vec3 dir(std::cos(cameraLook.x) * std::sin(cameraLook.y), std::sin(cameraLook.x), std::cos(cameraLook.x) * std::cos(cameraLook.y));
 	cameraDirection = dir;

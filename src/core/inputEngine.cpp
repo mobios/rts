@@ -17,6 +17,12 @@ bool flatMouse::inbounds(signed short x, signed short y){
 	return true;
 }
 
+void core::inputEngine::setup(){
+	input::settings::raw = false;
+	input::settings::hwpointer = false;
+	input::settings::captureMouse = true;
+}
+
 bool core::inputEngine::postMsg(UINT msg, WPARAM wParam, LPARAM lParam){
 	switch(msg){
 	case WM_KEYDOWN:
@@ -49,7 +55,14 @@ bool core::inputEngine::postMsg(UINT msg, WPARAM wParam, LPARAM lParam){
 		
 	case WM_RBUTTONDOWN:
 		checkModify(wParam);
-		asm ("int3");
+		if(input::settings::captureMouse){
+			input::settings::captureMouse = false;
+			centerCursor();
+		}
+		else{
+			input::settings::captureMouse = true;
+		}
+		
 		for(flatMouse* mouseObj : mouseEvents){
 			if(mouseObj->inbounds(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam))){
 				mouseObj->down_r();
@@ -93,8 +106,10 @@ bool core::inputEngine::postMsg(UINT msg, WPARAM wParam, LPARAM lParam){
 		
 		mousex = GET_X_LPARAM(lParam);
 		mousey = GET_Y_LPARAM(lParam);
-		centerCursor();
-		core::engine::gameEngine::moveAngles(float(mousey-300)/1000, float(mousex-400)/1000);
+		if(!input::settings::captureMouse){
+			centerCursor();
+			core::engine::gameEngine::moveAngles(float(300-mousey)/1000, float(mousex-400)/1000);
+		}
 		return true;
 	
 	case WM_DESTROY:
@@ -151,3 +166,4 @@ flatMouse* core::inputEngine::highlight;
 bool core::inputEngine::keys[256];
 bool settings::raw;
 bool settings::hwpointer;
+bool settings::captureMouse;

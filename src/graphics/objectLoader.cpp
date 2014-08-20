@@ -73,7 +73,6 @@ void graphics::objectLoader::load(const char *objPath, const char *texPath){
 	}
 	
 	auto tempModel = new model(loadBMP(texPath), outVertices);
-	asm ("int3");
 	graphics::engine::renderEngine::registerModel(tempModel);
 }
 

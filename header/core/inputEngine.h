@@ -24,11 +24,10 @@ namespace core{
 			bool inbounds(signed short x, signed short y);
 		};
 		
-		class settings{
+		struct settings{
 			static bool raw;
 			static bool hwpointer;
-			
-		public:
+			static bool captureMouse;
 			static bool getRaw(){return raw;};
 			static bool getHwpointer(){return hwpointer;};
 		};
@@ -37,6 +36,7 @@ namespace core{
 	struct inputEngine{
 		static std::list<input::flatMouse*> mouseEvents;
 		
+		static void setup();
 		static bool postMsg(UINT, WPARAM, LPARAM);
 		static void registerMouse(input::flatMouse*);
 		static bool isShift(){return shift;};
