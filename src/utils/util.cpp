@@ -23,6 +23,10 @@ void util::timing::setup(){
 	freq = float(freq_long.QuadPart);
 }
 
+void util::parseCmd(LPSTR cmdLine){
+	std::string cmdLineStr(cmdLine);
+}
+
 float util::timing::freq;
 float util::timing::delta;
 long long util::timing::last;

@@ -4,6 +4,7 @@
 #include <string>
 #include <sstream>
 #include <windows.h>
+#include <regex>
 
 namespace util{
 	std::string itos(long);
@@ -17,5 +18,7 @@ namespace util{
 		static void setup();
 		static long long getFreq(){return freq;};
 	};
+	
+	void parseCmd(LPSTR);
 }
 #endif

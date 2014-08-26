@@ -3,7 +3,6 @@
 
 #include "glm/glm.hpp"
 #include "glm/vec3.hpp"
-#include "utils/util.h"
 
 #include <string>
 #include <iostream>
@@ -12,6 +11,7 @@
 #include <fcntl.h>
 #include <windows.h>
 #undef __STRICT_ANSI__
+#include "utils/util.h"
 #include <cstdio>
 #include <cmath>
 #define __STRICT_ANSI__

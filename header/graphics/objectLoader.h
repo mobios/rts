@@ -12,7 +12,7 @@
 #include <vector>
 #include <fstream>
 
-
+#include <cstdint>
 
 namespace graphics{
 	class objectLoader{
@@ -21,6 +21,16 @@ namespace graphics{
 		static GLuint loadBMP(const char *);
 		static void setup();
 	};
+	
+	struct __attribute__ ((packed)) bmpHeader{
+		char magic[2];
+		int32_t size;
+		int32_t reserved;
+		int32_t offset;
+		
+		bool test();
+	};
+
 }
 
 #endif

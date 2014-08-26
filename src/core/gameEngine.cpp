@@ -162,6 +162,7 @@ instance::~instance(){
 
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow){
 	__debugMsg(Initialization);
+	util::parseCmd(lpCmdLine);
 	gameEngine::setup(hInstance);
 	gameEngine::run();
 }

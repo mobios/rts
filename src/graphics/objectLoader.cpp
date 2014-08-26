@@ -77,21 +77,29 @@ void graphics::objectLoader::load(const char *objPath, const char *texPath){
 }
 
 GLuint graphics::objectLoader::loadBMP(const char *path){
+	GLuint texID;
+	glGenTextures(1, &texID);
+	glBindTexture(GL_TEXTURE_2D, texID);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	
 	std::fstream texFile;
 	texFile.open(path, std::fstream::in | std::ios::binary);
 	
 	if(!texFile)
 		core::engine::gameEngine::error("Texture loading failed. Could not open file at " + *path);
 		
-	char header[54];
-	texFile.read(header, 54);
-	if(header[0] != 'B' || header[1] != 'M')
+	bmpHeader header;
+	texFile.read((char*)&header, sizeof(header));
+	if(!header.test())
 		core::engine::gameEngine::error("Texture loading failed. Magic header not found for file at " + *path);
-		
-	unsigned int dataOffset = *(int*)&(header[0x0A]);
-	unsigned int width = *(int*)&(header[0x12]);
-	unsigned int height = *(int*)&(header[0x16]);
-	unsigned int imageSize = *(int*)&(header[0x22]);
+	
+	BITMAPINFOHEADER dib;
+	texFile.read((char*)&dib, sizeof(dib));
+
+	auto width = dib.biWidth;
+	auto height = dib.biHeight;
+	std::size_t imageSize = (std::size_t)header.size;
 	
 	if(width == 0 || (width & width-1))
 		core::engine::gameEngine::error("Texture loading failed. Width must be a power of two and nonzero."
@@ -101,20 +109,19 @@ GLuint graphics::objectLoader::loadBMP(const char *path){
 		core::engine::gameEngine::error("Texture loading failed. Height must be a power of two and nonzero."
 										"found height of " + util::itos(height) + " at path " + *path);
 	
-	imageSize = imageSize ? imageSize : width * height *3;
-	dataOffset = dataOffset ? dataOffset : 54;
-	
+	if(dib.biSize > (sizeof(header) + sizeof(dib)))
+		texFile.seekg((dib.biSize - sizeof(header) - sizeof(dib)), std::ios_base::cur);
+		
 	char* texture = new char[imageSize];
 	texFile.read(texture, imageSize);
 	texFile.close();
 	
-	GLuint texID;
-	glGenTextures(1, &texID);
-	glBindTexture(GL_TEXTURE_2D, texID);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, texture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
+	if(dib.biBitCount == 24)
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, texture);
+	else if (dib.biBitCount == 32)
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture);
+		
+	delete texture;
 	return texID;
 }
 
@@ -122,4 +129,10 @@ void graphics::objectLoader::setup(){
 	load("resources/capsule.obj", "resources/capsule0.bmp");
 	graphics::engine::renderEngine::setupVertexBuffer();
 	//graphics::engine::renderEngine::populateVertexBuffer();
+}
+
+bool graphics::bmpHeader::test(){
+	if(magic[0] == 'B' && magic[1] == 'M')
+		return true;
+	return false;
 }
