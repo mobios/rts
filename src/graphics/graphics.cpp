@@ -208,6 +208,7 @@ void renderEngine::setupProgram(){
 		free(logContents);
 		core::engine::gameEngine::error(msg);
 	}
+	
 	glUseProgram(programID);
 	uniformHandles::MVPmatrix = glGetUniformLocation(programID, "MVP");
 	uniformHandles::textureSampler = glGetUniformLocation(programID, "texSampler");
