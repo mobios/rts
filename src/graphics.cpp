@@ -39,7 +39,7 @@ bool windowEngine::createWindow(HINSTANCE hInstance, WNDPROC wndProc){
 		  
 	hWnd = CreateWindow( $apptitle,
 						 $apptitle,
-						 WS_OVERLAPPEDWINDOW,
+						 WS_POPUP,
 						 CW_USEDEFAULT,
 						 CW_USEDEFAULT,
 						 800,

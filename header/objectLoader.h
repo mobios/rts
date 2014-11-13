@@ -11,7 +11,7 @@ namespace graphics{
 		static void setup();
 	};
 	#pragma pack(push)
-	#pragma pack(0)
+	#pragma pack(1)
 	struct __attribute__ ((packed)) bmpHeader{
 		char magic[2];
 		int32_t size;
