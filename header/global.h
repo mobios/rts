@@ -1,9 +1,6 @@
 #ifndef cpp_rts_global
 #define cpp_rts_global
 
-#include <iomanip>
-#include <iostream>
-
 #define $apptitle "rts"
 #define DEBUG_SPACING std::setw(100)
 #define DEBUG_FORMAT std::setiosflags(std::ios::left | std::ios::showbase | std::ios::uppercase) << std::setfill('.')
