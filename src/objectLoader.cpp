@@ -88,12 +88,12 @@ GLuint graphics::objectLoader::loadBMP(const char *path){
 	glBindTexture(GL_TEXTURE_2D, texID);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	
+
 	std::fstream texFile;
 	texFile.open(path, std::fstream::in | std::ios::binary);
 	
 	if(!texFile)
-		core::engine::gameEngine::error("Texture loading failed. Could not open file at " + *path);
+		core::engine::gameEngine::error("Texture loading failed. Could not open file at " + std::string(path));
 	
 	
 	std::cout << "Header " << sizeof(bmpHeader) << std::endl;
@@ -117,12 +117,12 @@ GLuint graphics::objectLoader::loadBMP(const char *path){
 	std::size_t imageSize = (std::size_t)header.size;
 	
 	if(width == 0 || (width & width-1))
-		core::engine::gameEngine::error("Texture loading failed. Width must be a power of two and nonzero."
-										"found width of " + util::itos(width) + " at path " + *path);
+		core::engine::gameEngine::error("Texture loading failed. Width must be a power of two and nonzero.\n"
+										"Found width of " + util::itos(width) + " at path " + std::string(path));
 										
 	if(height == 0 || (height & height-1))
-		core::engine::gameEngine::error("Texture loading failed. Height must be a power of two and nonzero."
-										"found height of " + util::itos(height) + " at path " + *path);
+		core::engine::gameEngine::error("Texture loading failed. Height must be a power of two and nonzero.\n"
+										"Found height of " + util::itos(height) + " at path " + std::string(path));
 	
 	if(dib.biSize > (sizeof(header) + sizeof(dib)))
 		texFile.seekg((dib.biSize - sizeof(header) - sizeof(dib)), std::ios_base::cur);

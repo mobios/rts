@@ -10,6 +10,7 @@ namespace graphics{
 		static GLuint loadBMP(const char *);
 		static void setup();
 	};
+	
 	#pragma pack(push)
 	#pragma pack(1)
 	struct __attribute__ ((packed)) bmpHeader{

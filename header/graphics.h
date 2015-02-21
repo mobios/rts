@@ -6,6 +6,13 @@
 namespace graphics{
 	struct model;
 	struct gpuVertex;
+
+	struct UItext
+	{
+		std::string text;
+		float x, y;
+		bool enabled;
+	};
 	
 	namespace engine{
 		struct windowEngine{
@@ -40,17 +47,21 @@ namespace graphics{
 			static void setupVertexBuffer();
 			static void populateVertexBuffer();
 			
+			static GLuint initializeProgram(const char *, const char *); 
+
 			static GLuint loadShader(std::string, GLenum);
 			static GLuint registerTexture(std::string, std::size_t, void*);
 			static void registerModel(model*);
 			static std::size_t lookupModel(const char*);
 			static void renderModel(std::size_t, glm::mat4*);
+
+			static void renderText();
 			
 			static const glm::mat4 getViewMatrix(){return view;};
 			static const glm::mat4 getProjectionMatrix(){return projection;};
 			
 			static void setViewMatrix(glm::mat4* vParam){view = *vParam;};
-						
+			
 			class uniformHandles{
 				friend struct renderEngine;
 				static GLuint textureSampler;
@@ -61,18 +72,22 @@ namespace graphics{
 			};
 			
 		private:
+			static std::vector<UItext> elements_text;
 			static std::vector<model*> models;
-			static GLuint programID;
 			
 			static GLuint vertexArrayID;
 			static GLuint vertexBufferID;
 			
 			static glm::mat4 view;
 			static glm::mat4 projection;
+
+			static GLuint modelProgramID;
+			static GLuint textProgramID;
 		};
 	}
 	
-	struct model{
+	struct model
+	{
 		std::string uuid;
 		GLuint texID;
 		long long gpuBufferOffset;
@@ -89,7 +104,8 @@ namespace graphics{
 		std::vector<graphics::gpuVertex> data;
 	};
 	
-	struct gpuVertex{
+	struct gpuVertex
+	{
 		glm::vec3 vertex;
 		glm::vec2 uv;
 		glm::vec3 normal;

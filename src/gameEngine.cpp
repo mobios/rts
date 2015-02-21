@@ -2,23 +2,37 @@
 
 using namespace core::engine;
 
-LRESULT CALLBACK WndProcStatic(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam){
+LRESULT CALLBACK WndProcStatic(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
+{
 	if(core::inputEngine::postMsg(msg, wparam, lparam))
 		return 0;
 	return DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
-void gameEngine::error(std::string exitmsg){
-	#ifdef PARAM_DEBUG
-		std::cout << exitmsg;
-		asm ("int3");
-	#else
-		MessageBox(NULL, exitmsg.c_str(), "Error", MB_OK | MB_ICONERROR);
-	#endif
+void dbInputExit()
+{
+	HANDLE hstdin = GetStdHandle(STD_INPUT_HANDLE);
+	DWORD fdwMode = ENABLE_WINDOW_INPUT;
+	SetConsoleMode(hstdin,fdwMode);
+	INPUT_RECORD inbuf[2];
+	DWORD numread;
+	ReadConsoleInput(
+		hstdin,
+		inbuf,
+		2,
+		&numread
+	);
+}
+
+void gameEngine::error(std::string exitmsg)
+{
+	MessageBox(NULL, exitmsg.c_str(), "Error", MB_OK | MB_ICONERROR);
 	exit(2);
 }
 
-void gameEngine::error(bool flag, std::string exitmsg){
+
+void gameEngine::error(bool flag, std::string exitmsg)
+{
 	if(!flag)
 		error(exitmsg);
 }
@@ -40,6 +54,7 @@ void gameEngine::setup(HINSTANCE hInst){
 		*stdout = *stdstream;
 		std::cout.clear();
 		std::cout << "RUNNING\n";
+		
 	#endif
 	graphics::engine::windowEngine::setup(hInst, WndProcStatic);
 	graphics::engine::renderEngine::setup();

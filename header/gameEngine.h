@@ -21,7 +21,7 @@ namespace core{
 			
 		public:
 			static void error(bool, std::string);
-			static void error(std::string);
+			static void error(std::string) __attribute__((noreturn));
 			static void setup(HINSTANCE);
 			static void run();
 			static void input();

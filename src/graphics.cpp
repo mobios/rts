@@ -10,7 +10,8 @@ void windowEngine::setup(const HINSTANCE hInst, const WNDPROC WndProc){
 
 WNDCLASS* windowEngine::genWndClass(const HINSTANCE hInstance,
 										   const WNDPROC WndProc,
-										   const LPCSTR className){
+										   const LPCSTR className)
+{
 										   
 	WNDCLASS* wc = new WNDCLASS();
 	wc->style = CS_HREDRAW | CS_VREDRAW |CS_OWNDC;
@@ -37,17 +38,17 @@ bool windowEngine::createWindow(HINSTANCE hInstance, WNDPROC wndProc){
 	core::engine::gameEngine::error(bindWndClass(genWndClass(hInstance, wndProc, $apptitle)), 
 												 "Unable to register window class.");
 		  
-	hWnd = CreateWindow( $apptitle,
-						 $apptitle,
-						 WS_POPUP,
-						 CW_USEDEFAULT,
-						 CW_USEDEFAULT,
-						 800,
-						 600,
-						 NULL,
-						 NULL,
-						 hInstance,
-						 NULL);
+	hWnd = CreateWindow($apptitle,
+						$apptitle,
+						WS_POPUP,
+						CW_USEDEFAULT,
+						CW_USEDEFAULT,
+						800,
+						600,
+						NULL,
+						NULL,
+						hInstance,
+						NULL);
 						 
 	core::engine::gameEngine::error(hWnd, "Unable to create window.");
 	
@@ -185,12 +186,13 @@ void renderEngine::setupVertexAttributeArray(){
 	glBindVertexArray(vertexArrayID);
 }
 
-void renderEngine::setupProgram(){
-	programID = glCreateProgram();
-	glAttachShader(programID, loadShader("resources/shaders/fragment.glsl", GL_FRAGMENT_SHADER));
-	glAttachShader(programID, loadShader("resources/shaders/vertex.glsl", GL_VERTEX_SHADER));
-	glLinkProgram(programID);
-	
+GLuint renderEngine::initializeProgram(const char* fragment_path, const char* vertex_path)
+{
+	GLuint return_program = glCreateProgram();
+	glAttachShader(return_program, fragment_path, GL_FRAGMENT_SHADER);
+	glAttachShader(return_program, vertex_path, GL_VERTEX_SHADER);
+	glLinkProgram(return_program);
+
 	GLint programResult = GL_TRUE;
 	glGetProgramiv(programID, GL_LINK_STATUS, &programResult);
 	
@@ -200,21 +202,48 @@ void renderEngine::setupProgram(){
 		char* logContents = (char*)malloc(logLength);
 		glGetProgramInfoLog(programID, logLength, (int*)&logLength, logContents);
 		logContents[logLength-1] = 0;
-		std::string msg = "Main OpenGL program could not link:\n" + std::string(logContents);
+
+		std::string msg = "Fragment Shader: " + std::string(fragment_path) + "\nVertex Shader: " + std::string(vertex_path) + "\n";
+
+		msg += "OpenGL program could not link:\n" + std::string(logContents);
 		free(logContents);
 		core::engine::gameEngine::error(msg);
 	}
+	return return_program;
+}
+
+void renderEngine::setupProgram(){
+	// programID = glCreateProgram();
+	// glAttachShader(programID, loadShader("resources/shaders/modelf.glsl", GL_FRAGMENT_SHADER));
+	// glAttachShader(programID, loadShader("resources/shaders/modelv.glsl", GL_VERTEX_SHADER));
+	// glLinkProgram(programID);
+	
+	// GLint programResult = GL_TRUE;
+	// glGetProgramiv(programID, GL_LINK_STATUS, &programResult);
+	
+	// if(programResult != GL_TRUE){
+	// 	std::size_t logLength;
+	// 	glGetProgramiv(programID, GL_INFO_LOG_LENGTH, (int*)&logLength);
+	// 	char* logContents = (char*)malloc(logLength);
+	// 	glGetProgramInfoLog(programID, logLength, (int*)&logLength, logContents);
+	// 	logContents[logLength-1] = 0;
+	// 	std::string msg = "Main OpenGL program could not link:\n" + std::string(logContents);
+	// 	free(logContents);
+	// 	core::engine::gameEngine::error(msg);
+	// }
+	modelProgramID = initializeProgram("resources/shaders/modelf.glsl","resources/shaders/modelv.glsl");
+	textProgramID = initializeProgram("resources/shaders/guif.glsl","resources/shaders/guiv.glsl");
 	
 	glUseProgram(programID);
 	uniformHandles::MVPmatrix = glGetUniformLocation(programID, "MVP");
 	uniformHandles::textureSampler = glGetUniformLocation(programID, "texSampler");
 	glUniform1i(uniformHandles::textureSampler,0);
-	//glEnable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	
 	glCullFace(GL_BACK);
-	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
 }
 
 void renderEngine::setupVertexBuffer(){
@@ -375,6 +404,7 @@ GLuint renderEngine::uniformHandles::MVPmatrix;
 GLuint renderEngine::programID;
 GLuint renderEngine::vertexArrayID;
 GLuint renderEngine::vertexBufferID;
+std::vector<graphics::text> renderEngine::elements_text;
 std::vector<graphics::model*> renderEngine::models;
 glm::mat4 renderEngine::view;
 glm::mat4 renderEngine::projection;
