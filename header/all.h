@@ -16,20 +16,20 @@
 #define __STRICT_ANSI__
 
 #include <iomanip>
-#include <iostream>
 #include <string>
-#include <iostream>
 #include <vector>
+#include <list>
 #include <io.h>
 #include <fcntl.h>
-#include <windows.h>
-#include <fstream>
 #include <cstdint>
-#include <sstream>
-#include <regex>
-#include <windowsx.h>
-#include <list>
 #include <cstdlib>
+#include <cstdio>
+#include <iostream>
+#include <sstream>
+#include <fstream>
+#include <regex>
+#include <windows.h>
+#include <windowsx.h>
 #include <GL\gl.h>
 #include <GL\glext.h>
 #include <GL\wglext.h>
@@ -47,5 +47,6 @@
 #include "gameEngine.h"
 #include "objectLoader.h"
 #include "inputEngine.h"
+#include "font.h"
 
 #endif

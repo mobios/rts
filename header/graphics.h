@@ -7,6 +7,12 @@ namespace graphics{
 	struct model;
 	struct gpuVertex;
 
+	enum programType
+	{
+		PRG_UI,
+		PRG_MODEL
+	};
+
 	struct UItext
 	{
 		std::string text;
@@ -28,7 +34,11 @@ namespace graphics{
 			static void setup(const HINSTANCE, const WNDPROC);
 		};
 		
-		struct renderEngine{
+		struct renderEngine
+		{
+
+			static GLuint currentTextureVector;
+
 			static bool funcload;
 			static bool context;
 			static constexpr HDC* hDC = &windowEngine::hDC;
@@ -43,11 +53,12 @@ namespace graphics{
 			
 			static void setup();
 			static void setupVertexAttributeArray();
-			static void setupProgram();
+			static void setupPrograms();
 			static void setupVertexBuffer();
 			static void populateVertexBuffer();
 			
-			static GLuint initializeProgram(const char *, const char *); 
+			static GLuint initializeProgram(const char *, const char *);
+			static void assertProgram(programType);
 
 			static GLuint loadShader(std::string, GLenum);
 			static GLuint registerTexture(std::string, std::size_t, void*);
@@ -81,6 +92,7 @@ namespace graphics{
 			static glm::mat4 view;
 			static glm::mat4 projection;
 
+			static GLuint currentProgram;
 			static GLuint modelProgramID;
 			static GLuint textProgramID;
 		};

@@ -232,7 +232,7 @@ void renderEngine::setupProgram(){
 	// 	core::engine::gameEngine::error(msg);
 	// }
 	modelProgramID = initializeProgram("resources/shaders/modelf.glsl","resources/shaders/modelv.glsl");
-	textProgramID = initializeProgram("resources/shaders/guif.glsl","resources/shaders/guiv.glsl");
+	GUIProgramID = initializeProgram("resources/shaders/guif.glsl","resources/shaders/guiv.glsl");
 	
 	glUseProgram(programID);
 	uniformHandles::MVPmatrix = glGetUniformLocation(programID, "MVP");
