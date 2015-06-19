@@ -1,16 +1,16 @@
-#include "all.h"
+#include "font.h"
 
 bool font::loadFont(std::string filePath)
 {
 
-	FILE* fontFile = std::fopen(filePath, "rb");
+	FILE* fontFile = std::fopen(filePath.c_str(), "rb");
 	if(!fontFile)
 	{
 		std::cerr << "Font not found at path: " << filePath << std::endl;
 		std::cerr << "Source file: " << __FILE__ << std::endl;
 		std::cerr << "Source line: " << __LINE__ << std::endl;
 
-		std::fclose(filePath);
+		std::fclose(fontFile);
 
 		return false;
 	}
@@ -26,7 +26,7 @@ bool font::loadFont(std::string filePath)
 		std::cerr << "Source file: " << __FILE__ << std::endl;
 		std::cerr << "Source line: " << __LINE__ << std::endl;
 
-		std::fclose(filePath);
+		std::fclose(fontFile);
 
 		return false;
 	}
@@ -37,7 +37,7 @@ bool font::loadFont(std::string filePath)
 	std::fread(&cellWidth, sizeof(cellWidth), 1, fontFile);
 	std::fread(&cellHeight, sizeof(cellHeight), 1, fontFile);
 
-	std::fread(&bitDetph, sizeof(bitDetph), 1, fontFile);
+	std::fread(&bitDepth, sizeof(bitDepth), 1, fontFile);
 
 	unsigned char testOffset;
 	std::fread(&testOffset, sizeof(testOffset), 1, fontFile);
@@ -48,7 +48,7 @@ bool font::loadFont(std::string filePath)
 		std::cerr << "Source file: " << __FILE__ << std::endl;
 		std::cerr << "Source line: " << __LINE__ << std::endl;
 
-		std::fclose(filePath);
+		std::fclose(fontFile);
 
 		return false;
 	}
@@ -56,13 +56,32 @@ bool font::loadFont(std::string filePath)
 
 	std::fread(&widths, sizeof(unsigned char), sizeof(widths)/sizeof(unsigned char), fontFile);
 
-	void* imgData = malloc(textureHeight*textureWidth*(bitDetph/8));
-	std::fread(imgData, 1, textureHeight*textureWidth*(bitDetph/8),filePath);
+	void* imgData = malloc(textureHeight*textureWidth*(bitDepth/8));
+	std::fread(imgData, 1, textureHeight*textureWidth*(bitDepth/8),fontFile);
 
 
-	glGenTextures(&textureVector, 1);
+	glGenTextures(1, &textureVector);
 	glBindTexture(GL_TEXTURE_2D, textureVector);
 	
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
+	
+	switch(bitDepth)
+	{
+	case DEPTH_RGB:
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureWidth, textureHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, imgData);
+		break;
+		
+	case DEPTH_RGBA:
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureWidth, textureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, imgData);
+		break;
+	}
+	
+	free(imgData);
+	imgData = nullptr;
+	
+	return true;
 }

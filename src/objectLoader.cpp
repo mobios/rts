@@ -1,4 +1,4 @@
-#include "all.h"
+#include "objectLoader.h"
 
 void graphics::objectLoader::load(const char *objPath, const char *texPath){
 	std::fstream objFile;

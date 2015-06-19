@@ -1,5 +1,4 @@
-#include "all.h"
-#include "glWrapper.h"
+#include "graphics.h"
 
 using namespace graphics::engine;
 
@@ -175,7 +174,7 @@ void renderEngine::setup(){
 						
 	projection = glm::perspective(core::settings::fov, core::settings::aspectRatio, 0.1f, 100.f);
 	setupVertexAttributeArray();
-	setupProgram();
+	setupPrograms();
 	glActiveTexture(GL_TEXTURE0);
 	glEnable(GL_TEXTURE_2D);
 	objectLoader::setup();
@@ -189,18 +188,23 @@ void renderEngine::setupVertexAttributeArray(){
 GLuint renderEngine::initializeProgram(const char* fragment_path, const char* vertex_path)
 {
 	GLuint return_program = glCreateProgram();
-	glAttachShader(return_program, fragment_path, GL_FRAGMENT_SHADER);
-	glAttachShader(return_program, vertex_path, GL_VERTEX_SHADER);
+	GLuint fshader = loadShader(fragment_path, GL_FRAGMENT_SHADER);
+	GLuint vshader = loadShader(vertex_path, GL_VERTEX_SHADER);
+	glAttachShader(return_program, fshader);
+	glAttachShader(return_program, vshader);
 	glLinkProgram(return_program);
 
+	glDeleteShader(fshader);
+	glDeleteShader(vshader);	
+	
 	GLint programResult = GL_TRUE;
-	glGetProgramiv(programID, GL_LINK_STATUS, &programResult);
+	glGetProgramiv(return_program, GL_LINK_STATUS, &programResult);
 	
 	if(programResult != GL_TRUE){
 		std::size_t logLength;
-		glGetProgramiv(programID, GL_INFO_LOG_LENGTH, (int*)&logLength);
+		glGetProgramiv(return_program, GL_INFO_LOG_LENGTH, (int*)&logLength);
 		char* logContents = (char*)malloc(logLength);
-		glGetProgramInfoLog(programID, logLength, (int*)&logLength, logContents);
+		glGetProgramInfoLog(return_program, logLength, (int*)&logLength, logContents);
 		logContents[logLength-1] = 0;
 
 		std::string msg = "Fragment Shader: " + std::string(fragment_path) + "\nVertex Shader: " + std::string(vertex_path) + "\n";
@@ -212,7 +216,7 @@ GLuint renderEngine::initializeProgram(const char* fragment_path, const char* ve
 	return return_program;
 }
 
-void renderEngine::setupProgram(){
+void renderEngine::setupPrograms(){
 	// programID = glCreateProgram();
 	// glAttachShader(programID, loadShader("resources/shaders/modelf.glsl", GL_FRAGMENT_SHADER));
 	// glAttachShader(programID, loadShader("resources/shaders/modelv.glsl", GL_VERTEX_SHADER));
@@ -234,7 +238,7 @@ void renderEngine::setupProgram(){
 	modelProgramID = initializeProgram("resources/shaders/modelf.glsl","resources/shaders/modelv.glsl");
 	GUIProgramID = initializeProgram("resources/shaders/guif.glsl","resources/shaders/guiv.glsl");
 	
-	glUseProgram(programID);
+	glUseProgram(modelProgramID);
 	uniformHandles::MVPmatrix = glGetUniformLocation(programID, "MVP");
 	uniformHandles::textureSampler = glGetUniformLocation(programID, "texSampler");
 	glUniform1i(uniformHandles::textureSampler,0);
@@ -401,10 +405,10 @@ HGLRC renderEngine::hGLrc;
 GLuint renderEngine::uniformHandles::textureSampler;
 GLuint renderEngine::uniformHandles::MVPmatrix;
 
-GLuint renderEngine::programID;
+GLuint renderEngine::modelProgramID;
+GLuint renderEngine::GUIProgramID;
 GLuint renderEngine::vertexArrayID;
 GLuint renderEngine::vertexBufferID;
-std::vector<graphics::text> renderEngine::elements_text;
 std::vector<graphics::model*> renderEngine::models;
 glm::mat4 renderEngine::view;
 glm::mat4 renderEngine::projection;

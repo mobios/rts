@@ -3,6 +3,9 @@
 
 #include "all.h"
 
+#define DEPTH_RGB	24
+#define DEPTH_RGBA	32
+
 struct font
 {
 	unsigned int textureHeight, textureWidth;

@@ -2,6 +2,9 @@
 #define cpp_rts_graphics
 
 #include "all.h"
+#include "gameEngine.h"
+#include "objectLoader.h"
+#include "glWrapper.h"
 
 namespace graphics{
 	struct model;
@@ -13,12 +16,6 @@ namespace graphics{
 		PRG_MODEL
 	};
 
-	struct UItext
-	{
-		std::string text;
-		float x, y;
-		bool enabled;
-	};
 	
 	namespace engine{
 		struct windowEngine{
@@ -83,7 +80,6 @@ namespace graphics{
 			};
 			
 		private:
-			static std::vector<UItext> elements_text;
 			static std::vector<model*> models;
 			
 			static GLuint vertexArrayID;
@@ -94,7 +90,7 @@ namespace graphics{
 
 			static GLuint currentProgram;
 			static GLuint modelProgramID;
-			static GLuint textProgramID;
+			static GLuint GUIProgramID;
 		};
 	}
 	

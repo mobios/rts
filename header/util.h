@@ -3,9 +3,15 @@
 
 #include "all.h"
 
-namespace util{
+namespace util
+{
+
+	bool populateFromDirectory(std::vector<std::string>&, const char *, bool);
+	
 	std::string itos(long);
-	class timing{
+	
+	class timing
+	{
 		static long long last;
 		static float freq;
 		static float delta;

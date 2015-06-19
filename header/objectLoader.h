@@ -2,6 +2,8 @@
 #define cpp_rts_objectLoader
 
 #include "all.h"
+#include "gameEngine.h"
+#include "graphics.h"
 
 namespace graphics{
 	class objectLoader{

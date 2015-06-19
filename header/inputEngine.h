@@ -2,6 +2,7 @@
 #define cpp_rts_inputengine
 
 #include "all.h"
+#include "graphics.h"
 
 namespace core{
 	namespace input{
