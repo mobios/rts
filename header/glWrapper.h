@@ -1,7 +1,6 @@
 #ifndef cpp_rts_glWrapper
 #define cpp_rts_glWrapper
 
-// #include "all.h"
 
 typedef HGLRC (APIENTRYP PFNWGLCREATECONTEXTATTRIBSARBPROC) (HDC hDC, HGLRC hShareContext, const int *attribList);
 

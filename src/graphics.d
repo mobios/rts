@@ -1,10 +1,10 @@
-src/graphics.o: src/graphics.cpp header/all.h header/glm/vec3.hpp \
- header/glm/detail/type_vec3.hpp header/glm/detail/type_vec.hpp \
- header/glm/detail/precision.hpp header/glm/detail/type_int.hpp \
- header/glm/detail/setup.hpp header/glm/detail/type_vec3.inl \
- header/glm/vec2.hpp header/glm/detail/type_vec2.hpp \
- header/glm/detail/type_vec2.inl header/glm/glm.hpp \
- header/glm/detail/_fixes.hpp header/glm/fwd.hpp \
+src/graphics.o: src/graphics.cpp header/graphics.h header/all.h \
+ header/macro.h header/glm/vec3.hpp header/glm/detail/type_vec3.hpp \
+ header/glm/detail/type_vec.hpp header/glm/detail/precision.hpp \
+ header/glm/detail/type_int.hpp header/glm/detail/setup.hpp \
+ header/glm/detail/type_vec3.inl header/glm/vec2.hpp \
+ header/glm/detail/type_vec2.hpp header/glm/detail/type_vec2.inl \
+ header/glm/glm.hpp header/glm/detail/_fixes.hpp header/glm/fwd.hpp \
  header/glm/detail/type_int.hpp header/glm/detail/type_float.hpp \
  header/glm/detail/type_vec.hpp header/glm/detail/type_mat.hpp \
  header/glm/vec2.hpp header/glm/vec3.hpp header/glm/vec4.hpp \
@@ -58,11 +58,14 @@ src/graphics.o: src/graphics.cpp header/all.h header/glm/vec3.hpp \
  header/glm/gtc/../vec2.hpp header/glm/gtc/../vec3.hpp \
  header/glm/gtc/../vec4.hpp header/glm/gtc/matrix_transform.inl \
  header/glm/gtc/../geometric.hpp header/glm/gtc/../trigonometric.hpp \
- header/glm/gtc/../matrix.hpp header/global.h header/util.h header/all.h \
- header/graphics.h header/gameEngine.h header/objectLoader.h \
- header/inputEngine.h header/glWrapper.h
+ header/glm/gtc/../matrix.hpp header/error.h header/objectLoader.h \
+ header/util.h header/graphics.h header/settings.h header/glWrapper.h
+
+header/graphics.h:
 
 header/all.h:
+
+header/macro.h:
 
 header/glm/vec3.hpp:
 
@@ -290,18 +293,14 @@ header/glm/gtc/../trigonometric.hpp:
 
 header/glm/gtc/../matrix.hpp:
 
-header/global.h:
-
-header/util.h:
-
-header/all.h:
-
-header/graphics.h:
-
-header/gameEngine.h:
+header/error.h:
 
 header/objectLoader.h:
 
-header/inputEngine.h:
+header/util.h:
+
+header/graphics.h:
+
+header/settings.h:
 
 header/glWrapper.h:

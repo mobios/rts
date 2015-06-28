@@ -1,6 +1,7 @@
 #include "gameEngine.h"
 
 using namespace core::engine;
+TRIGGER engineTeardown = &gameEngine::teardown;
 
 LRESULT CALLBACK WndProcStatic(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
@@ -24,22 +25,11 @@ void dbInputExit()
 	);
 }
 
-void gameEngine::error(std::string exitmsg)
+
+void gameEngine::setup(HINSTANCE hInst)
 {
-	MessageBox(NULL, exitmsg.c_str(), "Error", MB_OK | MB_ICONERROR);
-	exit(2);
-}
-
-
-void gameEngine::error(bool flag, std::string exitmsg)
-{
-	if(!flag)
-		error(exitmsg);
-}
-
-void gameEngine::setup(HINSTANCE hInst){
-	settings::fov = 45.f;
-	settings::aspectRatio = 4.0f/3.0f;
+	core::settings::fov = 45.f;
+	core::settings::aspectRatio = 4.0f/3.0f;
 	
 	cameraLook.x = -0.616;
 	cameraLook.y = -2.255;
@@ -63,7 +53,9 @@ void gameEngine::setup(HINSTANCE hInst){
 	instance first("a");
 }
 
-void gameEngine::run(){
+
+void gameEngine::run()
+{
 	while(1){
 		util::timing::advance();
 		input();
@@ -72,16 +64,20 @@ void gameEngine::run(){
 	teardown();				// Semantics
 }
 
-void gameEngine::input(){
+void gameEngine::input()
+{
 	MSG msg;
-	while(PeekMessage(&msg,NULL,0,0, PM_REMOVE)){
-		switch(msg.message){
+	while(PeekMessage(&msg,NULL,0,0, PM_REMOVE))
+	{
+		switch(msg.message)
+		{
 		case WM_DESTROY:
 		case WM_CLOSE:
 			std::cout << "teardown\n";
 			teardown();
 			break;
 		}
+		
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
@@ -102,7 +98,8 @@ void gameEngine::input(){
 		moveCameraR(-2*util::timing::deltaTime());
 }
 
-void gameEngine::render(){
+void gameEngine::render()
+{
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	for(auto &object : instances){
 		object->render();
@@ -110,18 +107,28 @@ void gameEngine::render(){
 	graphics::engine::renderEngine::swapBuffers();
 }
 
-void gameEngine::registerInstance(instance* instanceParam){
+
+void gameEngine::registerInstance(instance* instanceParam)
+{
 	instances.push_back(instanceParam);
 }
 
-void gameEngine::teardown(int xit){
+void gameEngine::teardown()
+{
+	gameEngine::teardown(-1);
+}
+
+void gameEngine::teardown(int xit)
+{
 	#ifdef PARAM_DEBUG
 		FreeConsole();
 	#endif
 	exit(xit);
 }
 
-void gameEngine::moveAngles(float deltaVertical, float deltaHorizontal){
+
+void gameEngine::moveAngles(float deltaVertical, float deltaHorizontal)
+{
 	cameraLook.x += deltaVertical;
 	cameraLook.y -= deltaHorizontal;
 	glm::vec3 dir(std::cos(cameraLook.x) * std::sin(cameraLook.y), std::sin(cameraLook.x), std::cos(cameraLook.x) * std::cos(cameraLook.y));
@@ -153,11 +160,13 @@ void gameEngine::genView(){
 	graphics::engine::renderEngine::setViewMatrix(&view);
 }
 
-void instance::render(){
+void instance::render()
+{
 	graphics::engine::renderEngine::renderModel(modelCpuOffset, &modelMatrix);
 }
 
-instance::instance(const char* modelUuid, bool unused){
+instance::instance(const char* modelUuid, bool unused)
+{
 	modelCpuOffset = graphics::engine::renderEngine::lookupModel(modelUuid);
 	modelMatrix = glm::mat4(1.0f);
 	dynamic = true;
@@ -166,7 +175,8 @@ instance::instance(const char* modelUuid, bool unused){
 	dynamic = false;	
 }
 
-instance::~instance(){
+instance::~instance()
+{
 	if(dynamic)
 		delete this;
 }
@@ -186,5 +196,3 @@ glm::vec3 core::engine::gameEngine::cameraPos;
 glm::vec2 core::engine::gameEngine::cameraLook;
 glm::vec3 core::engine::gameEngine::cameraDirection;
 glm::vec3 core::engine::gameEngine::cameraRight;
-float core::settings::fov;
-float core::settings::aspectRatio;

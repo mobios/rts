@@ -15,13 +15,15 @@ bool flatMouse::inbounds(signed short x, signed short y){
 	return true;
 }
 
-void core::inputEngine::setup(){
+void core::inputEngine::setup()
+{
 	input::settings::raw = false;
 	input::settings::hwpointer = false;
 	input::settings::captureMouse = true;
 }
 
-bool core::inputEngine::postMsg(UINT msg, WPARAM wParam, LPARAM lParam){
+bool core::inputEngine::postMsg(UINT msg, WPARAM wParam, LPARAM lParam)
+{
 	switch(msg){
 	case WM_KEYDOWN:
 		keys[(unsigned char)wParam] = true;
@@ -80,10 +82,12 @@ bool core::inputEngine::postMsg(UINT msg, WPARAM wParam, LPARAM lParam){
 		return false;
 		
 	case WM_MOUSEMOVE:
-		if(moved){
+		if(moved)
+		{
 			moved = false;
 			return true;
 		}
+
 		checkModify(wParam);
 		if(input::settings::getRaw())
 			return false;
@@ -91,7 +95,8 @@ bool core::inputEngine::postMsg(UINT msg, WPARAM wParam, LPARAM lParam){
 		if(highlight != NULL && !highlight->inbounds(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)))
 			highlight->out();
 		
-		for(flatMouse* mouseObj : mouseEvents){
+		for(flatMouse* mouseObj : mouseEvents)
+		{
 			if(mouseObj->inbounds(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam))){
 				highlight = mouseObj;
 				highlight->over();
@@ -104,36 +109,42 @@ bool core::inputEngine::postMsg(UINT msg, WPARAM wParam, LPARAM lParam){
 		
 		mousex = GET_X_LPARAM(lParam);
 		mousey = GET_Y_LPARAM(lParam);
-		if(!input::settings::captureMouse){
+		if(!input::settings::captureMouse)
+		{
 			centerCursor();
-			core::engine::gameEngine::moveAngles(float(300-mousey)/1000, float(mousex-400)/1000);
+			mouseMovementCallback(float(300-mousey)/1000, float(mousex-400)/1000);
+			//core::engine::gameEngine::moveAngles(float(300-mousey)/1000, float(mousex-400)/1000);
 		}
+
 		return true;
 	
 	case WM_DESTROY:
-		std::cout << "WM_DESTROY posted...\nExiting\n";
-		core::engine::gameEngine::teardown();
+		core::error("WM_DESTROY posted...\nExiting\n");
 	
 	case WM_CLOSE:
-		std::cout << "WM_CLOSE posted...\nExiting\n";
-		core::engine::gameEngine::teardown();
+		core::error("WM_CLOSE posted...\nExiting\n");
 	}
 	return false;
 }
 
-void core::inputEngine::registerMouse(flatMouse* mobj){
+void core::inputEngine::registerMouse(flatMouse* mobj)
+{
 	mouseEvents.push_back(mobj);
 }
 
-bool core::inputEngine::queryKey(unsigned char keyQuery){
+bool core::inputEngine::queryKey(unsigned char keyQuery)
+{
 	return keys[keyQuery];
 }
 
-void core::inputEngine::notifyDead(flatMouse* mobj){
+void core::inputEngine::notifyDead(flatMouse* mobj)
+{
 	mouseEvents.remove(mobj);
 }
 
-void core::inputEngine::checkModify(WPARAM wParam){
+
+void core::inputEngine::checkModify(WPARAM wParam)
+{
 	if(wParam | MK_SHIFT)
 		shift = true;
 	else
@@ -145,7 +156,8 @@ void core::inputEngine::checkModify(WPARAM wParam){
 		ctrl = false;
 }
 
-void core::inputEngine::centerCursor(){
+void core::inputEngine::centerCursor()
+{
 	POINT cursor;
 	cursor.x = 400;
 	cursor.y = 300;
@@ -160,7 +172,10 @@ bool core::inputEngine::ctrl;
 bool core::inputEngine::moved;
 int core::inputEngine::mousex;
 int core::inputEngine::mousey;
+
 flatMouse* core::inputEngine::highlight;
+
+mouseMovementMessage core::inputEngine::mouseMovementCallback;
 bool core::inputEngine::keys[256];
 bool settings::raw;
 bool settings::hwpointer;

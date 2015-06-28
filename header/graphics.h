@@ -2,11 +2,12 @@
 #define cpp_rts_graphics
 
 #include "all.h"
-#include "gameEngine.h"
+#include "error.h"
 #include "objectLoader.h"
-#include "glWrapper.h"
+#include "settings.h"
 
-namespace graphics{
+namespace graphics
+{
 	struct model;
 	struct gpuVertex;
 
@@ -17,8 +18,10 @@ namespace graphics{
 	};
 
 	
-	namespace engine{
-		struct windowEngine{
+	namespace engine
+	{
+		struct windowEngine
+		{
 			static HWND hWnd;
 			static HDC hDC;
 			
@@ -70,7 +73,8 @@ namespace graphics{
 			
 			static void setViewMatrix(glm::mat4* vParam){view = *vParam;};
 			
-			class uniformHandles{
+			class uniformHandles
+			{
 				friend struct renderEngine;
 				static GLuint textureSampler;
 				static GLuint MVPmatrix;

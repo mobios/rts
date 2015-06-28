@@ -58,9 +58,8 @@ src/gameEngine.o: src/gameEngine.cpp header/gameEngine.h header/all.h \
  header/glm/gtc/../vec2.hpp header/glm/gtc/../vec3.hpp \
  header/glm/gtc/../vec4.hpp header/glm/gtc/matrix_transform.inl \
  header/glm/gtc/../geometric.hpp header/glm/gtc/../trigonometric.hpp \
- header/glm/gtc/../matrix.hpp header/inputEngine.h header/graphics.h \
- header/gameEngine.h header/objectLoader.h header/glWrapper.h \
- header/util.h
+ header/glm/gtc/../matrix.hpp header/inputEngine.h header/error.h \
+ header/graphics.h header/objectLoader.h header/util.h header/settings.h
 
 header/gameEngine.h:
 
@@ -296,12 +295,12 @@ header/glm/gtc/../matrix.hpp:
 
 header/inputEngine.h:
 
-header/graphics.h:
+header/error.h:
 
-header/gameEngine.h:
+header/graphics.h:
 
 header/objectLoader.h:
 
-header/glWrapper.h:
-
 header/util.h:
+
+header/settings.h:

@@ -4,15 +4,19 @@
 #include "all.h"
 #include "inputEngine.h"
 #include "graphics.h"
+#include "settings.h"
 #include "util.h"
 
 // extern double M_PI;
 
-namespace core{
-	namespace engine{
+namespace core
+{
+	namespace engine
+	{
 		struct instance;
 		
-		class gameEngine{
+		class gameEngine
+		{
 			static HINSTANCE hInstance;
 			static std::vector<instance*> instances;
 			static glm::vec3 cameraPos;
@@ -23,14 +27,13 @@ namespace core{
 			static float deltaTime;
 			
 		public:
-			static void error(bool, std::string);
-			static void error(std::string) __attribute__((noreturn));
 			static void setup(HINSTANCE);
 			static void run();
 			static void input();
 			static void render();
 			static void registerInstance(instance*);
-			static void teardown(int xit = 0);
+			static void teardown() __attribute__((noreturn));
+			static void teardown(int) __attribute__((noreturn));
 			
 			static glm::vec3* getCameraPos(){return &cameraPos;};
 			static glm::vec2* getCameraLook(){return &cameraLook;};
@@ -41,7 +44,8 @@ namespace core{
 			static void genView();
 		};
 		
-		struct instance{
+		struct instance
+		{
 			glm::mat4 modelMatrix;
 			std::size_t modelCpuOffset;
 			std::size_t instanceVectorOffset;
@@ -54,11 +58,6 @@ namespace core{
 			bool dynamic;
 		};
 	}
-	
-	struct settings{
-		static float fov;
-		static float aspectRatio;
-	};
 }
 
 #endif

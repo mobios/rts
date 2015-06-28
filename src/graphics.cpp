@@ -1,8 +1,10 @@
 #include "graphics.h"
+#include "glWrapper.h"
 
 using namespace graphics::engine;
 
-void windowEngine::setup(const HINSTANCE hInst, const WNDPROC WndProc){
+void windowEngine::setup(const HINSTANCE hInst, const WNDPROC WndProc)
+{
 	createWindow(hInst, WndProc);
 	__debugMsg(Window creation);
 }
@@ -26,15 +28,19 @@ WNDCLASS* windowEngine::genWndClass(const HINSTANCE hInstance,
 	return wc;
 }
 
-bool windowEngine::bindWndClass(WNDCLASS* WndClass){
+
+bool windowEngine::bindWndClass(WNDCLASS* WndClass)
+{
 	WNDCLASS wc = *WndClass;
 	delete WndClass;
 	WndClass = NULL;
 	return RegisterClass(&wc);
 }
 
-bool windowEngine::createWindow(HINSTANCE hInstance, WNDPROC wndProc){
-	core::engine::gameEngine::error(bindWndClass(genWndClass(hInstance, wndProc, $apptitle)), 
+
+bool windowEngine::createWindow(HINSTANCE hInstance, WNDPROC wndProc)
+{
+	core::error(bindWndClass(genWndClass(hInstance, wndProc, $apptitle)), 
 												 "Unable to register window class.");
 		  
 	hWnd = CreateWindow($apptitle,
@@ -49,21 +55,23 @@ bool windowEngine::createWindow(HINSTANCE hInstance, WNDPROC wndProc){
 						hInstance,
 						NULL);
 						 
-	core::engine::gameEngine::error(hWnd, "Unable to create window.");
+	core::error(hWnd, "Unable to create window.");
 	
 	hDC = GetDC(hWnd);
 	__debugVal(hDC at generation, hDC);
-	core::engine::gameEngine::error(hDC, "Unable to fetch device context.");
+	core::error(hDC, "Unable to fetch device context.");
 	makeAvailable();
 }
 
-void windowEngine::makeAvailable(){
+void windowEngine::makeAvailable()
+{
 	ShowWindow(hWnd, SW_SHOW);
 	SetForegroundWindow(hWnd);
 	SetFocus(hWnd);
 }
 
-void renderEngine::makeOldContext(){
+void renderEngine::makeOldContext()
+{
 	PIXELFORMATDESCRIPTOR pfd;
 	memset(&pfd, 0, sizeof(pfd));
 	
@@ -75,17 +83,18 @@ void renderEngine::makeOldContext(){
 	pfd.cDepthBits = 32;
 	pfd.iLayerType = PFD_MAIN_PLANE;
 	int nPixelFormat = ChoosePixelFormat(*hDC, &pfd);
-	core::engine::gameEngine::error(nPixelFormat, "Unable to choose pixel format.");
+	core::error(nPixelFormat, "Unable to choose pixel format.");
 	
-	core::engine::gameEngine::error(SetPixelFormat(*hDC, nPixelFormat, &pfd), "Unable to set pixel format.");
+	core::error(SetPixelFormat(*hDC, nPixelFormat, &pfd), "Unable to set pixel format.");
 	
-	core::engine::gameEngine::error((hGLrc = wglCreateContext(*hDC)), "Unable to create 2.1 context");
+	core::error((hGLrc = wglCreateContext(*hDC)), "Unable to create 2.1 context");
 	makeCurrent(*hDC);
 	__debugMsg(OpenGL 1.x context creation);
 }
 
-void renderEngine::makeNewContext(){
-	core::engine::gameEngine::error(hGLrc != 0, "1.1 context required to create 3.1 context.");
+void renderEngine::makeNewContext()
+{
+	core::error(hGLrc != 0, "1.1 context required to create 3.1 context.");
 	int gla[] = {	WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
 					WGL_CONTEXT_MINOR_VERSION_ARB, 1,
 					WGL_CONTEXT_FLAGS_ARB, 0,
@@ -93,7 +102,7 @@ void renderEngine::makeNewContext(){
 	};
 	HGLRC tempHGLRC = wglCreateContextAttribsARB(*hDC, 0, gla);
 	if(!tempHGLRC)
-		core::engine::gameEngine::error("Could not upgrade context");
+		core::error("Could not upgrade context");
 
 	wglMakeCurrent(NULL, NULL);
 	wglDeleteContext(hGLrc);
@@ -107,16 +116,17 @@ void renderEngine::makeNewContext(){
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 }
 
-void renderEngine::loadExtensions(){
+void renderEngine::loadExtensions()
+{
 	__debugMsg(Begin extension loading);
-	core::engine::gameEngine::error(hGLrc, "1.1 context required to load extensions");
+	core::error(hGLrc, "1.1 context required to load extensions");
 	__debugVal(hDC, *hDC);
 	
 	wglGetExtensionsStringARB = (PFNWGLGETEXTENSIONSSTRINGARBPROC) wglGetProcAddress("wglGetExtensionsStringARB");
 	const char* extensions = wglGetExtensionsStringARB(*hDC);
 	__debugMsg(Supported extension strings fetched);
 	if(!strstr(extensions, "WGL_ARB_create_context"))
-		core::engine::gameEngine::error("OpenGL 3/4 not supported.");
+		core::error("OpenGL 3/4 not supported.");
 	__debugMsg(Checking OpenGL 3+ capability);
 	__loadGL(wglCreateContextAttribsARB, PFNWGLCREATECONTEXTATTRIBSARBPROC);
 	__loadGL(glGenBuffers, PFNGLGENBUFFERSPROC);
@@ -147,7 +157,8 @@ void renderEngine::loadExtensions(){
 	__debugMsg(OpenGL extension loading);
 }
 
-void renderEngine::makeCurrent(HDC hDC, bool erase){
+void renderEngine::makeCurrent(HDC hDC, bool erase)
+{
 	if(!erase){
 		wglMakeCurrent(hDC, hGLrc);
 		return;
@@ -160,7 +171,8 @@ void renderEngine::makeCurrent(HDC hDC, bool erase){
 	wglMakeCurrent(NULL, NULL);
 }
 
-void renderEngine::setup(){
+void renderEngine::setup()
+{
 	funcload = false;
 	context = false;
 	hGLrc = NULL;
@@ -180,7 +192,8 @@ void renderEngine::setup(){
 	objectLoader::setup();
 }
 
-void renderEngine::setupVertexAttributeArray(){
+void renderEngine::setupVertexAttributeArray()
+{
 	glGenVertexArrays(1, &vertexArrayID);
 	glBindVertexArray(vertexArrayID);
 }
@@ -211,7 +224,7 @@ GLuint renderEngine::initializeProgram(const char* fragment_path, const char* ve
 
 		msg += "OpenGL program could not link:\n" + std::string(logContents);
 		free(logContents);
-		core::engine::gameEngine::error(msg);
+		core::error(msg);
 	}
 	return return_program;
 }
@@ -233,14 +246,14 @@ void renderEngine::setupPrograms(){
 	// 	logContents[logLength-1] = 0;
 	// 	std::string msg = "Main OpenGL program could not link:\n" + std::string(logContents);
 	// 	free(logContents);
-	// 	core::engine::gameEngine::error(msg);
+	// 	core::error(msg);
 	// }
 	modelProgramID = initializeProgram("resources/shaders/modelf.glsl","resources/shaders/modelv.glsl");
 	GUIProgramID = initializeProgram("resources/shaders/guif.glsl","resources/shaders/guiv.glsl");
 	
 	glUseProgram(modelProgramID);
-	uniformHandles::MVPmatrix = glGetUniformLocation(programID, "MVP");
-	uniformHandles::textureSampler = glGetUniformLocation(programID, "texSampler");
+	uniformHandles::MVPmatrix = glGetUniformLocation(modelProgramID, "MVP");
+	uniformHandles::textureSampler = glGetUniformLocation(modelProgramID, "texSampler");
 	glUniform1i(uniformHandles::textureSampler,0);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -300,7 +313,7 @@ GLuint renderEngine::loadShader(std::string spathparam, GLenum shaderType){
 	std::ifstream shaderFile(spathparam, std::ios::in | std::ios::binary);
 	
 	if(!shaderFile.is_open())
-		core::engine::gameEngine::error("File I/O error for shader at path: " + spathparam);
+		core::error("File I/O error for shader at path: " + spathparam);
 		
 	shaderFile.seekg(0,std::ios_base::end);
 	int shaderFileSize = shaderFile.tellg();
@@ -327,7 +340,7 @@ GLuint renderEngine::loadShader(std::string spathparam, GLenum shaderType){
 		logContents[shaderLogLength-1] = 0;
 		std::string errormsg = "Shader at path: " + spathparam + " could not compile. \n Error: \n\n" + logContents;
 		free(logContents);
-		core::engine::gameEngine::error(errormsg);
+		core::error(errormsg);
 	}
 	free(shaderString);
 	return shaderID;
@@ -340,7 +353,7 @@ void graphics::engine::renderEngine::registerModel(model* tModel){
 
 void graphics::engine::renderEngine::renderModel(std::size_t offset, glm::mat4* matrix){
 	if(offset >= models.size())
-		core::engine::gameEngine::error("Tried finding model at postition " + util::itos(offset) + "\nOnly " + util::itos(models.size()) + " models loaded");
+		core::error("Tried finding model at postition " + util::itos(offset) + "\nOnly " + util::itos(models.size()) + " models loaded");
 	models[offset]->render(matrix);
 }
 
@@ -355,7 +368,7 @@ std::size_t graphics::engine::renderEngine::lookupModel(const char* uuidParam){
 //		}
 	}
 	if(!found)
-		core::engine::gameEngine::error(std::string("Search for nonloaded model with uuid: ") + *uuidParam);
+		core::error(std::string("Search for nonloaded model with uuid: ") + *uuidParam);
 	
 	return offset;
 }

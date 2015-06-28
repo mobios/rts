@@ -2,11 +2,16 @@
 #define cpp_rts_inputengine
 
 #include "all.h"
+#include "error.h"
 #include "graphics.h"
 
-namespace core{
-	namespace input{
-		struct flatMouse{
+
+namespace core
+{
+	namespace input
+	{
+		struct flatMouse
+		{
 			virtual void over();
 			virtual void out();
 			virtual void down_l();
@@ -31,7 +36,8 @@ namespace core{
 		};
 	};
 	
-	struct inputEngine{
+	struct inputEngine
+	{
 		static std::list<input::flatMouse*> mouseEvents;
 		
 		static void setup();
@@ -54,6 +60,7 @@ namespace core{
 		static int mousex;
 		static int mousey;
 		
+		static mouseMovementMessage mouseMovementCallback;
 		static input::flatMouse* highlight;
 		
 		static bool keys[256];

@@ -40,19 +40,23 @@ bool util::populateFromDirectory(std::vector<std::string>& destination, const ch
 }
 
 
-std::string util::itos(long num){
+
+std::string util::itos(long num)
+{
 	std::ostringstream ss;
 	ss << num;
 	return ss.str();
 }
 
 
-float util::timing::deltaTime(){
+float util::timing::deltaTime()
+{
 	return delta;
 }
 
 
-void util::timing::advance(){
+void util::timing::advance()
+{
 	LARGE_INTEGER time_long;
 	QueryPerformanceCounter(&time_long);
 	delta = float(time_long.QuadPart - last)/freq;
@@ -60,14 +64,16 @@ void util::timing::advance(){
 }
 
 
-void util::timing::setup(){
+void util::timing::setup()
+{
 	LARGE_INTEGER freq_long;
 	QueryPerformanceFrequency(&freq_long);
 	freq = float(freq_long.QuadPart);
 }
 
 
-void util::parseCmd(LPSTR cmdLine){
+void util::parseCmd(LPSTR cmdLine)
+{
 	std::string cmdLineStr(cmdLine);
 }
 

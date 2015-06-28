@@ -1,6 +1,7 @@
 #include "objectLoader.h"
 
-void graphics::objectLoader::load(const char *objPath, const char *texPath){
+void graphics::objectLoader::load(const char *objPath, const char *texPath)
+{
 	std::fstream objFile;
 	std::string objLine;
 	
@@ -15,16 +16,19 @@ void graphics::objectLoader::load(const char *objPath, const char *texPath){
 	objFile.open(objPath, std::fstream::in | std::ios::binary);
 	
 	if(!objFile)
-		core::engine::gameEngine::error("Object loading failed. Could not open file at " + std::string(objPath));
+		core::error("Object loading failed. Could not open file at " + std::string(objPath));
 	
-	while(std::getline(objFile, objLine)){
+	while(std::getline(objFile, objLine))
+	{
 		glm::vec3 vertex;
 		glm::vec3 normal;
 		glm::vec2 uv;
 		
-		switch(objLine[0]){
+		switch(objLine[0])
+		{
 		case 'v':
-			switch(objLine[1]){
+			switch(objLine[1])
+			{
 			case ' ':
 				std::sscanf(objLine.substr(1).c_str(), "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z);
 				tempVertices.push_back(vertex);
@@ -93,14 +97,14 @@ GLuint graphics::objectLoader::loadBMP(const char *path){
 	texFile.open(path, std::fstream::in | std::ios::binary);
 	
 	if(!texFile)
-		core::engine::gameEngine::error("Texture loading failed. Could not open file at " + std::string(path));
+		core::error("Texture loading failed. Could not open file at " + std::string(path));
 	
 	
 	std::cout << "Header " << sizeof(bmpHeader) << std::endl;
 	bmpHeader header;
 	texFile.read((char*)&header, sizeof(header));
 	if(!test(header))
-		core::engine::gameEngine::error("Texture loading failed. Magic header not found for file at " + *path);
+		core::error("Texture loading failed. Magic header not found for file at " + *path);
 	
 	BITMAPINFOHEADER dib;
 	texFile.read((char*)&dib, sizeof(dib));
@@ -117,11 +121,11 @@ GLuint graphics::objectLoader::loadBMP(const char *path){
 	std::size_t imageSize = (std::size_t)header.size;
 	
 	if(width == 0 || (width & width-1))
-		core::engine::gameEngine::error("Texture loading failed. Width must be a power of two and nonzero.\n"
+		core::error("Texture loading failed. Width must be a power of two and nonzero.\n"
 										"Found width of " + util::itos(width) + " at path " + std::string(path));
 										
 	if(height == 0 || (height & height-1))
-		core::engine::gameEngine::error("Texture loading failed. Height must be a power of two and nonzero.\n"
+		core::error("Texture loading failed. Height must be a power of two and nonzero.\n"
 										"Found height of " + util::itos(height) + " at path " + std::string(path));
 	
 	if(dib.biSize > (sizeof(header) + sizeof(dib)))
