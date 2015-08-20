@@ -1,5 +1,5 @@
-#include "graphics.h"
-#include "glWrapper.h"
+#include "graphics/graphics.h"
+#include "graphics/glWrapper.h"
 
 using namespace graphics::engine;
 
@@ -189,7 +189,7 @@ void renderEngine::setup()
 	setupPrograms();
 	glActiveTexture(GL_TEXTURE0);
 	glEnable(GL_TEXTURE_2D);
-	objectLoader::setup();
+	util::loader::setup();
 }
 
 void renderEngine::setupVertexAttributeArray()
@@ -300,14 +300,16 @@ void renderEngine::setupVertexBuffer(){
 						  (void*)(sizeof(glm::vec3)+sizeof(glm::vec2)));
 }
 
-void renderEngine::populateVertexBuffer(){
+void renderEngine::populateVertexBuffer()
+{
 	std::size_t offset = 0;
 	for(auto &model : models){
 		glBufferSubData(GL_ARRAY_BUFFER, model->gpuBufferOffset, model->indices, &((model->data)[0]));
 	}
 }
 
-GLuint renderEngine::loadShader(std::string spathparam, GLenum shaderType){
+GLuint renderEngine::loadShader(std::string spathparam, GLenum shaderType)
+{
 	const GLuint shaderID = glCreateShader(shaderType);
 	std::string shaderSource;
 	std::ifstream shaderFile(spathparam, std::ios::in | std::ios::binary);

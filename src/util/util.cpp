@@ -1,4 +1,4 @@
-#include "util.h"
+#include "util/util.h"
 
 bool util::populateFromDirectory(std::vector<std::string>& destination, const char * path, bool recurse)
 {

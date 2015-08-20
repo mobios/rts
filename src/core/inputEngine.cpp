@@ -1,4 +1,4 @@
-#include "inputEngine.h"
+#include "core/inputEngine.h"
 
 using namespace core::input;
 
@@ -130,6 +130,11 @@ bool core::inputEngine::postMsg(UINT msg, WPARAM wParam, LPARAM lParam)
 void core::inputEngine::registerMouse(flatMouse* mobj)
 {
 	mouseEvents.push_back(mobj);
+}
+
+void core::inputEngine::registerMouseMovement(mouseMovementMessage callback)
+{
+	mouseMovementCallback = callback;
 }
 
 bool core::inputEngine::queryKey(unsigned char keyQuery)

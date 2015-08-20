@@ -1,0 +1,8 @@
+Refactor:
+	put shader loading in loader
+	
+Text:
+	make sure texture shaders are working
+	
+Model:
+	take a look at the model class and make sure it's not shit.

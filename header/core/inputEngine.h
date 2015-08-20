@@ -2,8 +2,8 @@
 #define cpp_rts_inputengine
 
 #include "all.h"
-#include "error.h"
-#include "graphics.h"
+#include "core/error.h"
+#include "graphics/graphics.h"
 
 
 namespace core
@@ -43,6 +43,8 @@ namespace core
 		static void setup();
 		static bool postMsg(UINT, WPARAM, LPARAM);
 		static void registerMouse(input::flatMouse*);
+		static void registerMouseMovement(mouseMovementMessage);
+		
 		static bool isShift(){return shift;};
 		static bool isCtrl(){return ctrl;};
 		static bool queryKey(unsigned char);

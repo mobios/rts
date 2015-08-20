@@ -24,8 +24,8 @@ lflags := -mwindows -static -lgdi32 -lopengl32
 cflags := -std=c++0x -g -Iheader -m32
 cc := C:\MinGW\bin\g++
 
-srcfiles := $(wildcard src/*.cpp)
-hdrfiles := $(wildcard header/*.h)
+srcfiles := $(wildcard */*/*.cpp)
+hdrfiles := $(wildcard */*/*.h)
 
 objfiles := $(srcfiles:.cpp=.o)
 dependencies := $(srcfiles:.cpp=.d)
@@ -37,5 +37,6 @@ $(target): $(objfiles)
 	
 .cpp.o:
 	$(cc) $(cflags) -MMD -MP -c $< -o $@
+
 	
 -include $(dependencies)

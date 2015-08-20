@@ -2,8 +2,8 @@
 #define cpp_rts_gui
 
 #include "all.h"
-#include "font.h"
-#include "util.h"
+#include "graphics/font.h"
+#include "util/util.h"
 
 namespace gui
 {

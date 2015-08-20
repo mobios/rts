@@ -2,13 +2,13 @@
 #define cpp_rts_objectLoader
 
 #include "all.h"
-#include "util.h"
-#include "graphics.h"
-#include "error.h"
+#include "util/util.h"
+#include "graphics/graphics.h"
+#include "core/error.h"
 
-namespace graphics
+namespace util
 {
-	class objectLoader
+	class loader
 	{
 	public:
 		static void load(const char *, const char *);

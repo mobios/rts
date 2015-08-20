@@ -2,9 +2,9 @@
 #define cpp_rts_graphics
 
 #include "all.h"
-#include "error.h"
-#include "objectLoader.h"
-#include "settings.h"
+#include "core/error.h"
+#include "util/loader.h"
+#include "core/settings.h"
 
 namespace graphics
 {

@@ -1,6 +1,6 @@
-#include "objectLoader.h"
+#include "util/loader.h"
 
-void graphics::objectLoader::load(const char *objPath, const char *texPath)
+void util::loader::load(const char *objPath, const char *texPath)
 {
 	std::fstream objFile;
 	std::string objLine;
@@ -9,7 +9,7 @@ void graphics::objectLoader::load(const char *objPath, const char *texPath)
 	std::vector<glm::vec2> tempUVs;
 	std::vector<glm::vec3> tempNorms;
 	
-	std::vector<gpuVertex> outVertices;
+	std::vector<graphics::gpuVertex> outVertices;
 	
 	std::size_t faces = 0;
 		
@@ -54,17 +54,17 @@ void graphics::objectLoader::load(const char *objPath, const char *texPath)
 						&v2.x, &v2.y, &v2.z,
 						&v3.x, &v3.y, &v3.z);
 
-			gpuVertex outV1;
+			graphics::gpuVertex outV1;
 			outV1.vertex = tempVertices[v1.x-1];
 			outV1.uv = tempUVs[v1.y-1];
 			outV1.normal = tempNorms[v1.z-1];
 			
-			gpuVertex outV2;
+			graphics::gpuVertex outV2;
 			outV2.vertex = tempVertices[v2.x-1];
 			outV2.uv = tempUVs[v2.y-1];
 			outV2.normal = tempNorms[v2.z-1];
 			
-			gpuVertex outV3;
+			graphics::gpuVertex outV3;
 			outV3.vertex = tempVertices[v3.x-1];
 			outV3.uv = tempUVs[v3.y-1];
 			outV3.normal = tempNorms[v3.z-1];
@@ -76,17 +76,13 @@ void graphics::objectLoader::load(const char *objPath, const char *texPath)
 		}
 	}
 	
-	auto tempModel = new model(loadBMP(texPath), outVertices);
+	auto tempModel = new graphics::model(loadBMP(texPath), outVertices);
 	graphics::engine::renderEngine::registerModel(tempModel);
 }
 
-bool test(graphics::bmpHeader& arg){
-	if(arg.magic[0] == 'B' && arg.magic[1] == 'M')
-		return true;
-	return false;
-}
 
-GLuint graphics::objectLoader::loadBMP(const char *path){
+GLuint util::loader::loadBMP(const char *path)
+{
 	GLuint texID;
 	glGenTextures(1, &texID);
 	glBindTexture(GL_TEXTURE_2D, texID);
@@ -103,18 +99,19 @@ GLuint graphics::objectLoader::loadBMP(const char *path){
 	std::cout << "Header " << sizeof(bmpHeader) << std::endl;
 	bmpHeader header;
 	texFile.read((char*)&header, sizeof(header));
-	if(!test(header))
+	
+	if(header.magic[0] != 'B' || header.magic[1] != 'M')
 		core::error("Texture loading failed. Magic header not found for file at " + *path);
 	
 	BITMAPINFOHEADER dib;
 	texFile.read((char*)&dib, sizeof(dib));
 	
-	printf("==BITMAPINFOHEADER==\n");
-	printf("biSize:  %20i 0x%X\n",dib.biSize,dib.biSize);
-	printf("biWidth:  %19i 0x%X\n",dib.biWidth,dib.biWidth);
-	printf("biHeight:  %18i 0x%X\n",dib.biHeight,dib.biHeight);
-	printf("biBitCount:  %16i 0x%X\n",dib.biBitCount,dib.biBitCount);
-	printf("biSizeImage:  %15i 0x%X\n",dib.biSizeImage,dib.biSizeImage);
+	// printf("==BITMAPINFOHEADER==\n");
+	// printf("biSize:  %20i 0x%X\n",dib.biSize,dib.biSize);
+	// printf("biWidth:  %19i 0x%X\n",dib.biWidth,dib.biWidth);
+	// printf("biHeight:  %18i 0x%X\n",dib.biHeight,dib.biHeight);
+	// printf("biBitCount:  %16i 0x%X\n",dib.biBitCount,dib.biBitCount);
+	// printf("biSizeImage:  %15i 0x%X\n",dib.biSizeImage,dib.biSizeImage);
 	
 	auto width = dib.biWidth;
 	auto height = dib.biHeight;
@@ -136,8 +133,10 @@ GLuint graphics::objectLoader::loadBMP(const char *path){
 	texFile.close();
 	std::cout << "width " << width << std::endl;
 	std::cout << "height " << height << std::endl;
+
 	if(dib.biBitCount == 24)
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, texture);
+
 	else if (dib.biBitCount == 32)
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture);
 		
@@ -145,7 +144,8 @@ GLuint graphics::objectLoader::loadBMP(const char *path){
 	return texID;
 }
 
-void graphics::objectLoader::setup(){
+void util::loader::setup()
+{
 	load("resources/capsule.obj", "resources/capsule0.bmp");
 	graphics::engine::renderEngine::setupVertexBuffer();
 	//graphics::engine::renderEngine::populateVertexBuffer();

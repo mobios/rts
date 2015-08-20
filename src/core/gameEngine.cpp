@@ -1,4 +1,4 @@
-#include "gameEngine.h"
+#include "core/gameEngine.h"
 
 using namespace core::engine;
 TRIGGER engineTeardown = &gameEngine::teardown;
@@ -46,10 +46,13 @@ void gameEngine::setup(HINSTANCE hInst)
 		std::cout << "RUNNING\n";
 		
 	#endif
+
 	graphics::engine::windowEngine::setup(hInst, WndProcStatic);
 	graphics::engine::renderEngine::setup();
 	core::inputEngine::setup();
 	util::timing::setup();
+
+	core::inputEngine::registerMouseMovement(&moveAngles);
 	instance first("a");
 }
 
@@ -101,7 +104,8 @@ void gameEngine::input()
 void gameEngine::render()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	for(auto &object : instances){
+	for(auto &object : instances)
+	{
 		object->render();
 	}
 	graphics::engine::renderEngine::swapBuffers();
@@ -150,10 +154,10 @@ void gameEngine::moveCameraR(float deltaRight){
 }
 
 void gameEngine::genView(){
-	std::cout << "Camera Pos:\nX: " << cameraPos.x << "\nY: " << cameraPos.y << "\nZ:" << cameraPos.z << std::endl;
+	// std::cout << "Camera Pos:\nX: " << cameraPos.x << "\nY: " << cameraPos.y << "\nZ:" << cameraPos.z << std::endl;
 	//std::cout << "Camera Direction:\nX: " << cameraDirection.x << "\nY: " << cameraDirection.y << "\nZ:" << cameraDirection.z << std::endl;
 	
-	std::cout << "dV " << cameraLook.x << "   dH " << cameraLook.y << std::endl;
+	// std::cout << "dV " << cameraLook.x << "   dH " << cameraLook.y << std::endl;
 	glm::mat4 view = glm::lookAt(cameraPos,
 	                             cameraPos + cameraDirection,
 								 glm::vec3(0,1,0));

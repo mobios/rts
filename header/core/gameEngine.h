@@ -2,10 +2,11 @@
 #define cpp_rts_gameengine
 
 #include "all.h"
-#include "inputEngine.h"
-#include "graphics.h"
-#include "settings.h"
-#include "util.h"
+#include "core/inputEngine.h"
+#include "graphics/graphics.h"
+#include "core/settings.h"
+#include "util/util.h"
+
 
 // extern double M_PI;
 

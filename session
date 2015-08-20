@@ -1,0 +1,22 @@
+<NotepadPlus>
+    <Session activeView="0">
+        <mainView activeIndex="0">
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="1656" startPos="294" endPos="294" selMode="0" lang="C++" encoding="-1" filename="F:\Wgames\development\rts\header\global.h" />
+            <File firstVisibleLine="3" xOffset="0" scrollWidth="913" startPos="121" endPos="121" selMode="0" lang="C++" encoding="-1" filename="F:\Wgames\development\rts\header\graphics\glWrapper.h" />
+            <File firstVisibleLine="12" xOffset="0" scrollWidth="536" startPos="418" endPos="418" selMode="0" lang="C++" encoding="-1" filename="F:\Wgames\development\rts\header\core\gameEngine.h" />
+            <File firstVisibleLine="66" xOffset="0" scrollWidth="744" startPos="2569" endPos="2569" selMode="0" lang="C++" encoding="-1" filename="F:\Wgames\development\rts\header\graphics\graphics.h" />
+            <File firstVisibleLine="13" xOffset="0" scrollWidth="480" startPos="1053" endPos="1053" selMode="0" lang="C++" encoding="-1" filename="F:\Wgames\development\rts\header\core\inputEngine.h" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="984" startPos="602" endPos="459" selMode="0" lang="C++" encoding="-1" filename="F:\Wgames\development\rts\header\graphics\objectLoader.h" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="392" startPos="394" endPos="394" selMode="0" lang="C++" encoding="-1" filename="F:\Wgames\development\rts\header\utils\util.h" />
+        </mainView>
+        <subView activeIndex="1">
+            <File firstVisibleLine="130" xOffset="0" scrollWidth="1128" startPos="4429" endPos="4429" selMode="0" lang="C++" encoding="-1" filename="F:\Wgames\development\rts\src\core\gameEngine.cpp" />
+            <File firstVisibleLine="192" xOffset="0" scrollWidth="1256" startPos="6857" endPos="6857" selMode="0" lang="C++" encoding="-1" filename="F:\Wgames\development\rts\src\graphics\graphics.cpp" />
+            <File firstVisibleLine="78" xOffset="0" scrollWidth="864" startPos="2619" endPos="2619" selMode="0" lang="C++" encoding="-1" filename="F:\Wgames\development\rts\src\core\inputEngine.cpp" />
+            <File firstVisibleLine="92" xOffset="0" scrollWidth="925" startPos="3524" endPos="3524" selMode="0" lang="C++" encoding="-1" filename="F:\Wgames\development\rts\src\graphics\objectLoader.cpp" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="456" startPos="508" endPos="508" selMode="0" lang="C++" encoding="-1" filename="F:\Wgames\development\rts\src\utils\util.cpp" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="400" startPos="150" endPos="150" selMode="0" lang="Normal Text" encoding="-1" filename="F:\Wgames\development\rts\resources\shaders\fragment.glsl" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="376" startPos="0" endPos="0" selMode="0" lang="Normal Text" encoding="-1" filename="F:\Wgames\development\rts\resources\shaders\vertex.glsl" />
+        </subView>
+    </Session>
+</NotepadPlus>
